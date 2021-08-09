@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 
   Token* token = NULL;
   for(token = lexer_get_next_token(lexer); token->type != TOKEN_EOF; token = lexer_get_next_token(lexer))
+  {
     printf("TOKEN(%d, %s)\n", token->type, token->value);
-  
+  }
 }
