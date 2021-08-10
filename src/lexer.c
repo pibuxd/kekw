@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdio.h>
+
 Lexer* new_lexer(char* content)
 {
   Lexer* lexer = calloc(1, sizeof(Lexer));
