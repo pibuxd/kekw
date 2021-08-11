@@ -35,21 +35,26 @@ Token* lexer_get_next_token(Lexer* lexer)
   {
     if(lexer->current_c == ' ' || lexer->current_c == 10)
       lexer_skip_whitespace(lexer);
-
-    if(isalnum(lexer->current_c))
+    
+    if(isdigit(lexer->current_c))
+      return new_token(TOKEN_INT, lexer_collect_int(lexer));
+    else if(isalnum(lexer->current_c))
       return new_token(TOKEN_ID, lexer_collect_id(lexer));
-
-    if(lexer->current_c == '"')
+    else if(lexer->current_c == '"')
       return new_token(TOKEN_STRING, lexer_collect_string(lexer));
 
     switch(lexer->current_c)
     {
+      case '+': return lexer_advance_with_token(lexer, new_token(TOKEN_PLUS, lexer_get_current_char_as_string(lexer)));
+      case '-': return lexer_advance_with_token(lexer, new_token(TOKEN_MINUS, lexer_get_current_char_as_string(lexer)));
+      case '*': return lexer_advance_with_token(lexer, new_token(TOKEN_MUL, lexer_get_current_char_as_string(lexer)));
+      case '/': return lexer_advance_with_token(lexer, new_token(TOKEN_DIV, lexer_get_current_char_as_string(lexer)));
       case '=': return lexer_advance_with_token(lexer, new_token(TOKEN_EQUALS, lexer_get_current_char_as_string(lexer)));
       case ';': return lexer_advance_with_token(lexer, new_token(TOKEN_SEMI, lexer_get_current_char_as_string(lexer)));
-      case '{': return lexer_advance_with_token(lexer, new_token(TOKEN_LPAREN, lexer_get_current_char_as_string(lexer)));
-      case '}': return lexer_advance_with_token(lexer, new_token(TOKEN_RPAREN, lexer_get_current_char_as_string(lexer)));
-      case '(': return lexer_advance_with_token(lexer, new_token(TOKEN_LBRACE, lexer_get_current_char_as_string(lexer)));
-      case ')': return lexer_advance_with_token(lexer, new_token(TOKEN_RBRACE, lexer_get_current_char_as_string(lexer)));
+      case '(': return lexer_advance_with_token(lexer, new_token(TOKEN_LPAREN, lexer_get_current_char_as_string(lexer)));
+      case ')': return lexer_advance_with_token(lexer, new_token(TOKEN_RPAREN, lexer_get_current_char_as_string(lexer)));
+      case '{': return lexer_advance_with_token(lexer, new_token(TOKEN_LBRACE, lexer_get_current_char_as_string(lexer)));
+      case '}': return lexer_advance_with_token(lexer, new_token(TOKEN_RBRACE, lexer_get_current_char_as_string(lexer)));
       case ',': return lexer_advance_with_token(lexer, new_token(TOKEN_COMMA, lexer_get_current_char_as_string(lexer)));
     }
   }
@@ -83,6 +88,23 @@ char* lexer_collect_id(Lexer* lexer)
   str[0] = '\0';
 
   while(isalnum(lexer->current_c))
+  {
+    char* c = lexer_get_current_char_as_string(lexer);
+    str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));
+    strcat(str, c);
+
+    lexer_advance(lexer);
+  }
+
+  return str;
+}
+
+char* lexer_collect_int(Lexer* lexer)
+{
+  char* str = calloc(1, sizeof(char));
+  str[0] = '\0';
+
+  while(isdigit(lexer->current_c))
   {
     char* c = lexer_get_current_char_as_string(lexer);
     str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));

@@ -1,16 +1,29 @@
+#include "include/parser.h"
 #include "include/lexer.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char* argv[])
 {
-  Lexer* lexer = new_lexer(
-    "var name = \"Pi Bu\"\n"
-    "print(name, \"hello world\")\n"
-  );
-
+  Lexer* lexer = NULL;
   Token* token = NULL;
-  for(token = lexer_get_next_token(lexer); token->type != TOKEN_EOF; token = lexer_get_next_token(lexer))
+  Parser* parser = NULL;
+
+  while(1)
   {
-    printf("TOKEN(%d, %s)\n", token->type, token->value);
+    char* input = calloc(1000, sizeof(char));
+    fgets(input, 1000, stdin);
+    lexer = new_lexer(input);
+    token = lexer_get_next_token(lexer);
+    parser = new_parser(lexer, token);
+    int res = parser_expr(parser);
+
+    printf("res = %d\n", res);
   }
+
+
+  // for(token = lexer_get_next_token(lexer); token->type != TOKEN_EOF; token = lexer_get_next_token(lexer)){
+  //   printf("TOKEN(%d, %s)\n", token->type, token->value);
+  // }
+
 }
