@@ -1,7 +1,15 @@
 #include "include/parser.h"
-#include "include/lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+void x(AST* ast){
+  if(ast->token->type == TOKEN_INT){
+    printf("node: %s", ast->token->value);
+    return;
+  }
+
+  x(ast->right);
+}
 
 int main(int argc, char* argv[])
 {
@@ -16,9 +24,10 @@ int main(int argc, char* argv[])
     lexer = new_lexer(input);
     token = lexer_get_next_token(lexer);
     parser = new_parser(lexer, token);
-    int res = parser_expr(parser);
 
-    printf("res = %d\n", res);
+    parser_compound(parser);
+
+    x(parser->ast[1]);
   }
 
 

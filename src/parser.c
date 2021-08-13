@@ -8,6 +8,8 @@ Parser* new_parser(Lexer* lexer, Token* token){
   Parser* parser = calloc(1, sizeof(Parser));
   parser->lexer = lexer;
   parser->current_t = token;
+  parser->ast = calloc(1, sizeof(AST));
+  parser->ast_size = 1;
 
   return parser;
 }
@@ -27,63 +29,71 @@ void parser_eat(Parser* parser, int value)
   parser_get_next_token(parser);
 }
 
-int parser_expr(Parser* parser)
+AST* parser_expr(Parser* parser)
 {
-  int res = parser_term(parser);
+  AST* res = parser_term(parser);
 
   while(parser->current_t->type == TOKEN_PLUS || parser->current_t->type == TOKEN_MINUS)
   {
     Token* token = parser->current_t;
     if(token->type == TOKEN_PLUS){
       parser_eat(parser, TOKEN_PLUS);
-      res = res + parser_term(parser);
+      // res = res + parser_term(parser);
     }
     else if(token->type == TOKEN_MINUS)
     {
       parser_eat(parser, TOKEN_MINUS);
-      res = res - parser_term(parser);
+      // res = res - parser_term(parser);
     }
+
+    res = new_ast(res, parser_term(parser), token);
   }
 
   return res;
 }
 
-int parser_term(Parser* parser)
+AST* parser_term(Parser* parser)
 {
-  int res = parser_factor(parser);
+  AST* res = parser_factor(parser);
 
   while(parser->current_t->type == TOKEN_MUL || parser->current_t->type == TOKEN_DIV)
   {
     Token* token = parser->current_t;
     if(token->type == TOKEN_MUL){
       parser_eat(parser, TOKEN_MUL);
-      res = res * parser_factor(parser);
+      // res = res * parser_factor(parser);
     }
     else if(token->type == TOKEN_DIV)
     {
       parser_eat(parser, TOKEN_DIV);
-      res = res / parser_factor(parser);
+      // res = res / parser_factor(parser);
     }
+
+    res = new_ast(res, parser_factor(parser), token);
   }
 
   return res;
 }
 
-int parser_factor(Parser* parser)
+AST* parser_factor(Parser* parser)
 {
   Token* token = parser->current_t;
   if(token->type == TOKEN_INT)
   {
     parser_eat(parser, TOKEN_INT);
-    int integer = parser_stoi(token->value);
-    return integer;
+    // int integer = parser_stoi(token->value);
+    return new_ast(NULL, NULL, parser->current_t);
   }
   else if(token->type == TOKEN_LPAREN)
   {
     parser_eat(parser, TOKEN_LPAREN);
-    int res = parser_expr(parser);
+    AST* res = parser_expr(parser);
     parser_eat(parser, TOKEN_RPAREN);
     return res;
+  }
+  else if(token->type == TOKEN_ID)
+  {
+    printf("not yet: variable");
   }
 
   printf("NO FACTOR");
@@ -102,4 +112,59 @@ int parser_stoi(char* str){
   }
 
   return res;
+}
+
+void parser_compound(Parser* parser)
+{
+  parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
+  parser->ast[parser->ast_size] = parser_statement(parser);
+  parser->ast_size += 1;
+
+  while(parser->current_t->type == TOKEN_SEMI)
+  {
+    parser_eat(parser, TOKEN_SEMI);
+    parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
+    parser->ast[parser->ast_size] = parser_statement(parser);
+    parser->ast_size += 1;
+  }
+}
+
+AST* parser_statement(Parser* parser)
+{
+  AST* ast = calloc(1, sizeof(AST));
+  
+  if(parser->current_t->type == TOKEN_ID)
+  {
+    ast = parser_assignment_statement(parser);
+  }
+  else
+  {
+    ast = parser_ast_empty();
+  }
+
+  return ast;
+}
+
+AST* parser_assignment_statement(Parser* parser)
+{
+  AST* ast = calloc(1, sizeof(AST));
+  ast->left = new_ast(NULL, NULL, parser->current_t);
+  
+  printf("WERKS, %d\n", parser->current_t->type);
+  parser_eat(parser, TOKEN_ID);
+  printf("WERKS, %d\n", parser->current_t->type);
+
+  ast->token = parser->current_t;
+  parser_eat(parser, TOKEN_EQUALS);
+  printf("WERKS, %d\n", parser->current_t->type);
+
+  ast->right = parser_expr(parser);
+
+  return ast;
+}
+
+AST* parser_ast_empty()
+{
+  AST* ast = new_ast(NULL, NULL, NULL);
+  return ast;
 }
