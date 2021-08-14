@@ -5,7 +5,7 @@ typedef struct TOKEN_STRUCT
 {
   enum
   {
-    TOKEN_ID, // 0
+    TOKEN_ID = 0, // 0
     TOKEN_PLUS, // 1
     TOKEN_MINUS, // 2
     TOKEN_MUL, // 3

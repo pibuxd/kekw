@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void x(AST* ast, int side)
+void ast_walking(AST* ast, int side)
 {
   // if(ast->token->type == TOKEN_INT)
   // {
@@ -15,9 +15,10 @@ void x(AST* ast, int side)
   printf("%d: node -> %s\n", side, ast->token->value);
 
   if(ast->right != NULL)
-    x(ast->right, 1);
+    ast_walking(ast->right, 1);
+
   if(ast->left != NULL)
-    x(ast->left, 0);
+    ast_walking(ast->left, 0);
 }
 
 int main(int argc, char* argv[])
@@ -30,12 +31,12 @@ int main(int argc, char* argv[])
   {
     // char* input = calloc(1000, sizeof(char));
     // fgets(input, 1000, stdin);
-    lexer = new_lexer("var x = 5 + 2 + 3 * (5 + 4) - 1;\n");
+    lexer = new_lexer("var x = 6 / 2 + 3 * (5 + 4) - 1;\n");
     token = lexer_get_next_token(lexer);
     parser = new_parser(lexer, token);
 
     parser_compound(parser);
-    x(parser->ast[1], -1);
+    ast_walking(parser->ast[1], -1);
     break;
   }
 
