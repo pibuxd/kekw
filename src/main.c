@@ -1,4 +1,4 @@
-#include "include/parser.h"
+#include "include/visitor.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,18 +27,20 @@ int main(int argc, char* argv[])
   Token* token = NULL;
   Parser* parser = NULL;
 
-  while(1)
-  {
-    // char* input = calloc(1000, sizeof(char));
-    // fgets(input, 1000, stdin);
-    lexer = new_lexer("var x = 6 / 2 + 3 * (5 + 4) - 1;\n");
-    token = lexer_get_next_token(lexer);
-    parser = new_parser(lexer, token);
+  // char* input = calloc(1000, sizeof(char));
+  // fgets(input, 1000, stdin);
+  lexer = new_lexer(
+    "var x = (1*(9 * 5 + 10 - 3) * 5 + 1 - 2 - 3) * (0-1);\n"
+    "x;\n"
+  );
+  token = lexer_get_next_token(lexer);
+  parser = new_parser(lexer, token);
 
-    parser_compound(parser);
-    ast_walking(parser->ast[1], -1);
-    break;
-  }
+  parser_compound(parser);
+  ast_walking(parser->ast[1], -1);
+  puts("");
+  visit_assign_var(parser, parser->ast[1]);
+  // ast_walking(parser->ast[2], -1);
 
 
   // for(token = lexer_get_next_token(lexer); token->type != TOKEN_EOF; token = lexer_get_next_token(lexer)){

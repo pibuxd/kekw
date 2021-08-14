@@ -1,6 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
-#include "visitor.h"
+#include "ast.h"
 #include "lexer.h"
 
 typedef struct PARSER_STRUCT
@@ -9,6 +9,10 @@ typedef struct PARSER_STRUCT
     Token* current_t;
     AST** ast;
     unsigned int ast_size;
+    int* ids;
+    int* keywords;
+    int* function_it;
+    
 } Parser;
 
 Parser* new_parser(Lexer* lexer, Token* token);
@@ -22,8 +26,6 @@ AST* parser_expr(Parser* parser);
 AST* parser_term(Parser* parser);
 
 AST* parser_factor(Parser* parser);
-
-int parser_stoi(char* str);
 
 void parser_compound(Parser* parser);
 
