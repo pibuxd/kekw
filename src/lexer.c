@@ -59,7 +59,7 @@ Token* lexer_get_next_token(Lexer* lexer)
     }
   }
 
-  return new_token(TOKEN_EOF, "\0");
+  return new_token(TOKEN_EOF, "EOF");
 }
 
 char* lexer_collect_string(Lexer* lexer)

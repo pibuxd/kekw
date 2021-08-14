@@ -2,13 +2,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void x(AST* ast){
-  if(ast->token->type == TOKEN_INT){
-    printf("node: %s", ast->token->value);
-    return;
-  }
+void x(AST* ast, int side)
+{
+  // if(ast->token->type == TOKEN_INT)
+  // {
+  //   printf("%d: int -> %s\n", side, ast->token->value);
+  // }
+  // else if(ast->token->type == TOKEN_ID)
+  // {
+  //   printf("%d: id -> %s\n", side, ast->token->value);
+  // }
+  printf("%d: node -> %s\n", side, ast->token->value);
 
-  x(ast->right);
+  if(ast->right != NULL)
+    x(ast->right, 1);
+  if(ast->left != NULL)
+    x(ast->left, 0);
 }
 
 int main(int argc, char* argv[])
@@ -19,15 +28,15 @@ int main(int argc, char* argv[])
 
   while(1)
   {
-    char* input = calloc(1000, sizeof(char));
-    fgets(input, 1000, stdin);
-    lexer = new_lexer(input);
+    // char* input = calloc(1000, sizeof(char));
+    // fgets(input, 1000, stdin);
+    lexer = new_lexer("var x = 5 + 2 + 3 * (5 + 4) - 1;\n");
     token = lexer_get_next_token(lexer);
     parser = new_parser(lexer, token);
 
     parser_compound(parser);
-
-    x(parser->ast[1]);
+    x(parser->ast[1], -1);
+    break;
   }
 
 
