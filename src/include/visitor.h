@@ -12,10 +12,4 @@ void visit_assign_var(Parser* parser, AST* ast);
 
 void visit_get_var(Parser* parser, AST* ast);
 
-int visit_stoi(char* str);
-
-int visit_hash_string(char* str);
-
-void visit_noop(Parser* parser, AST* ast);
-
 #endif // !VISITOR_H
