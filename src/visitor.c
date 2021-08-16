@@ -27,19 +27,15 @@ int visit_expr(Parser* parser, AST* ast, int val)
   }
   else if(ast->token->type == TOKEN_MINUS)
   {
-    val += -1*(visit_expr(parser, ast->right, val) - visit_expr(parser, ast->left, val));
+    val += visit_expr(parser, ast->left, val) - visit_expr(parser, ast->right, val);
   }
   else if(ast->token->type == TOKEN_MUL)
   {
-    val += visit_expr(parser, ast->right, val) * visit_expr(parser, ast->left, val);
-    //val *= visit_expr(parser, ast->left, val);
+    val += visit_expr(parser, ast->left, val) * visit_expr(parser, ast->right, val);
   }
   else if(ast->token->type == TOKEN_DIV)
-  { //! bad rn
-    if(ast->right != NULL)
-      val /= visit_expr(parser, ast->right, val);
-    if(ast->left != NULL)
-      val /= visit_expr(parser, ast->left, val);
+  {
+    val += visit_expr(parser, ast->left, val) / visit_expr(parser, ast->right, val);
   }
   else if(ast->token->type == TOKEN_INT)
   {
