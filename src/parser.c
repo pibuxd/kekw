@@ -112,20 +112,20 @@ void parser_compound(Parser* parser)
   parser->ast[parser->ast_size] = parser_statement(parser);
   parser->ast_size += 1;
   parser_eat(parser, TOKEN_SEMI);
-  parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
-  parser->ast[parser->ast_size] = parser_statement(parser);
-  parser->ast_size += 1;
-  parser_eat(parser, TOKEN_SEMI);
-  // while(parser->current_t->type == TOKEN_SEMI)
-  // {
-  //   parser_eat(parser, TOKEN_SEMI);
-  //   printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
-  //   parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
-  //   parser->ast[parser->ast_size] = parser_statement(parser);
-  //   parser->ast_size += 1;
-  // }
+  // parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
+  // parser->ast[parser->ast_size] = parser_statement(parser);
+  // parser->ast_size += 1;
   // parser_eat(parser, TOKEN_SEMI);
-  // parser_eat(parser, TOKEN_EOF);
+  while(parser->current_t->type != TOKEN_EOF)
+  {
+    // parser_eat(parser, TOKEN_SEMI);
+    printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
+    parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
+    parser->ast[parser->ast_size] = parser_statement(parser);
+    parser->ast_size += 1;
+    parser_eat(parser, TOKEN_SEMI);
+  }
+  parser_eat(parser, TOKEN_EOF);
 }
 
 AST* parser_statement(Parser* parser)
@@ -139,7 +139,13 @@ AST* parser_statement(Parser* parser)
   else if(strcmp(parser->current_t->value, "x") == 0)
   {
     ast = new_ast(NULL, NULL, parser->current_t);
-    printf("okej\n");
+    printf("okej x\n");
+    parser_eat(parser, TOKEN_ID);
+  }
+  else if(strcmp(parser->current_t->value, "y") == 0)
+  {
+    ast = new_ast(NULL, NULL, parser->current_t);
+    printf("okej y\n");
     parser_eat(parser, TOKEN_ID);
   }
   return ast;
