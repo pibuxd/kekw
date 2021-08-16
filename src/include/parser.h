@@ -9,6 +9,7 @@ typedef struct PARSER_STRUCT
     Token* current_t;
     AST** ast;
     unsigned int ast_size;
+    int* id_type;
     int* ids;
     int* keywords;
     int* function_it;
@@ -33,6 +34,6 @@ AST* parser_statement(Parser* parser);
 
 AST* parser_assignment_statement(Parser* parser);
 
-AST* parser_ast_empty();
+int parser_get_var(Parser* pareser, int hashed);
 
 #endif // !PARSER_H
