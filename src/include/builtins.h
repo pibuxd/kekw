@@ -2,9 +2,6 @@
 #define BUILTINS_H
 // #include ""
 
-void builtin_print()
-{
-
-}
+void builtin_print();
 
 #endif // !BUILTINS_H
