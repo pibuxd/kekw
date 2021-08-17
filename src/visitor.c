@@ -50,5 +50,4 @@ void visit_assign_var(Parser* parser, AST* ast)
   char* var_name = ast->left->token->value;
   int var_name_hashed = utils_hash_string(var_name);
   parser->ids[var_name_hashed] = visit_expr(parser, ast->right, 0);
-  // printf("\nTEST: %d", parser->ids[var_name_hashed]);
 }
