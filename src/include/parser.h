@@ -34,6 +34,10 @@ AST* parser_statement(Parser* parser);
 
 AST* parser_assignment_statement(Parser* parser);
 
+AST* parser_call_function(Parser* parser);
+
+AST* parser_get_args(Parser* parser);
+
 int parser_get_var(Parser* pareser, int hashed);
 
 #endif // !PARSER_H

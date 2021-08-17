@@ -1,4 +1,5 @@
 #include "include/parser.h"
+#include "include/utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -84,7 +85,6 @@ AST* parser_factor(Parser* parser)
   {
     parser_eat(parser, TOKEN_INT);
     printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
-    // int integer = parser_stoi(token->value);
     return new_ast(NULL, NULL, token);
   }
   else if(token->type == TOKEN_LPAREN)
@@ -98,18 +98,12 @@ AST* parser_factor(Parser* parser)
   {
     printf("not yet: variable");
   }
-
   printf("NO FACTOR");
   exit(-1);
 }
 
 void parser_compound(Parser* parser)
 {
-  // parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
-  // parser->ast[parser->ast_size] = parser_statement(parser);
-  // parser->ast_size += 1;
-  // parser_eat(parser, TOKEN_SEMI);
-
   while(parser->current_t->type != TOKEN_EOF)
   {
     printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
@@ -124,18 +118,14 @@ void parser_compound(Parser* parser)
 AST* parser_statement(Parser* parser)
 {
   AST* ast = calloc(1, sizeof(AST));
-  
+  int hashed_value = utils_hash_string(parser->current_t->value);
   if(strcmp(parser->current_t->value, "var") == 0)
   {
     ast = parser_assignment_statement(parser);
   }
   else
   {
-    ast = new_ast(NULL, NULL, parser->current_t);
-    char* var_name = parser->current_t->value;
-    int hashed = var_name[0] - 'a' + 1;
-    printf("okej var: %d\n", parser->ids[hashed]);
-    parser_eat(parser, TOKEN_ID);
+    ast = parser_call_function(parser);
   }
 
   return ast;
@@ -160,6 +150,44 @@ AST* parser_assignment_statement(Parser* parser)
   ast->right = parser_expr(parser);
 
   return ast;
+}
+
+AST* parser_call_function(Parser* parser)
+{
+  AST* ast = calloc(1, sizeof(AST));
+
+  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
+  parser_eat(parser, TOKEN_ID);
+  
+  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
+  parser_eat(parser, TOKEN_LPAREN);
+
+  parser_get_args(parser);
+
+  ast->token = parser->current_t;
+  parser_eat(parser, TOKEN_RPAREN);
+  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
+
+  return ast;
+}
+
+AST* parser_get_args(Parser* parser)
+{
+  Token* token = parser->current_t;
+  if(lexer_peek(parser->lexer) != ')')
+  {
+    parser_eat(parser, TOKEN_ID);
+    parser_eat(parser, TOKEN_COMMA);
+    AST* ast = new_ast(NULL, parser_get_args(parser), token);
+
+    return ast;
+  }
+  else
+  {
+    parser_eat(parser, TOKEN_ID);
+    AST* ast = new_ast(NULL, NULL, token);
+    return ast;
+  }  
 }
 
 int parser_get_var(Parser* pareser, int hashed){
