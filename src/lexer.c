@@ -21,6 +21,15 @@ void lexer_advance(Lexer* lexer)
   }
 }
 
+char lexer_peek(Lexer* lexer)
+{
+  if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content))
+    return lexer->content[lexer->i];
+  else 
+    return ' ';
+
+}
+
 void lexer_skip_whitespace(Lexer* lexer)
 {
   while(lexer->current_c == ' ' || lexer->current_c == 10) // 10 is Line Feed in ASCII
