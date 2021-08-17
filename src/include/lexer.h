@@ -13,6 +13,8 @@ Lexer* new_lexer(char* content);
 
 void lexer_advance(Lexer* lexer);
 
+char lexer_peek(Lexer* lexer);
+
 void lexer_skip_whitespace(Lexer* lexer);
 
 Token* lexer_get_next_token(Lexer* lexer);
