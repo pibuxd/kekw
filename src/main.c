@@ -32,13 +32,13 @@ int main(int argc, char* argv[])
   lexer = new_lexer(
     "var x = (0 - 1) * (9 * 5 + 10 - 3)*5 + 1 - 2 - 3 * (0 - 1);\n"
     "var y = 10*5;\n"
-    "x;\n"
-    "y;\n"
+    "print((0 - 1) * (9 * 5 + 10 - 3)*5 + 1 - 2 - 3 * (0 - 1), x, y, \"XD\");\n"
   );
   token = lexer_get_next_token(lexer);
   parser = new_parser(lexer, token);
 
   parser_compound(parser);
+  puts("\nvisiting...\n");
   visit_compound(parser);
 
   // ast_walking(parser->ast[1], -1);
@@ -46,6 +46,6 @@ int main(int argc, char* argv[])
 
   // visit_assign_var(parser, parser->ast[1]);
   // visit_assign_var(parser, parser->ast[2]);
-  printf("xd: %d", parser->ids['y'-'a'+1]);
+  // printf("xd: %d", parser->ids['y'-'a'+1]);
   // ast_walking(parser->ast[2], -1);
 }
