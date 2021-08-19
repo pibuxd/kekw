@@ -29,6 +29,8 @@ void parser_eat(Parser* parser, int value)
     printf("expected token: %d, got: %d\n", value, parser->current_t->type);
     exit(-1);
   }
+
+  printf("token: {%d, %s}\n", parser->current_t->type, parser->current_t->value);
   parser_get_next_token(parser);
 }
 
@@ -39,14 +41,13 @@ AST* parser_expr(Parser* parser)
   while(parser->current_t->type == TOKEN_PLUS || parser->current_t->type == TOKEN_MINUS)
   {
     Token* token = parser->current_t;
-    if(token->type == TOKEN_PLUS){
+    if(token->type == TOKEN_PLUS)
+    {
       parser_eat(parser, TOKEN_PLUS);
-      printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
     }
     else if(token->type == TOKEN_MINUS)
     {
       parser_eat(parser, TOKEN_MINUS);
-      printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
     }
 
     res = new_ast(res, parser_term(parser), token);
@@ -62,14 +63,13 @@ AST* parser_term(Parser* parser)
   while(parser->current_t->type == TOKEN_MUL || parser->current_t->type == TOKEN_DIV)
   {
     Token* token = parser->current_t;
-    if(token->type == TOKEN_MUL){
+    if(token->type == TOKEN_MUL)
+    {
       parser_eat(parser, TOKEN_MUL);
-      printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
     }
     else if(token->type == TOKEN_DIV)
     {
       parser_eat(parser, TOKEN_DIV);
-      printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
     }
 
     res = new_ast(res, parser_factor(parser), token);
@@ -84,7 +84,11 @@ AST* parser_factor(Parser* parser)
   if(token->type == TOKEN_INT)
   {
     parser_eat(parser, TOKEN_INT);
-    printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
+    return new_ast(NULL, NULL, token);
+  }
+  else if(token->type == TOKEN_ID)
+  {
+    parser_eat(parser, TOKEN_ID);
     return new_ast(NULL, NULL, token);
   }
   else if(token->type == TOKEN_LPAREN)
@@ -96,7 +100,7 @@ AST* parser_factor(Parser* parser)
   }
   else if(token->type == TOKEN_ID)
   {
-    printf("not yet: variable");
+    printf("not yet: variable\n");
   }
   printf("NO FACTOR");
   exit(-1);
@@ -106,7 +110,6 @@ void parser_compound(Parser* parser)
 {
   while(parser->current_t->type != TOKEN_EOF)
   {
-    printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
     parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
     parser->ast[parser->ast_size] = parser_statement(parser);
     parser->ast_size += 1;
@@ -135,17 +138,13 @@ AST* parser_assignment_statement(Parser* parser)
 {
   AST* ast = calloc(1, sizeof(AST));
 
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
   parser_eat(parser, TOKEN_ID);
   
   ast->left = new_ast(NULL, NULL, parser->current_t);
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
   parser_eat(parser, TOKEN_ID);
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
 
   ast->token = parser->current_t;
   parser_eat(parser, TOKEN_EQUALS);
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
 
   ast->right = parser_expr(parser);
 
@@ -156,17 +155,20 @@ AST* parser_call_function(Parser* parser)
 {
   AST* ast = calloc(1, sizeof(AST));
 
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
-  parser_eat(parser, TOKEN_ID);
-  
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
+  ast->token = parser->current_t;
+  if(parser->current_t->type == TOKEN_ID)
+  {
+    parser_eat(parser, TOKEN_ID);
+  }
+  else
+  {
+    parser_eat(parser, TOKEN_STRING);
+  }  
   parser_eat(parser, TOKEN_LPAREN);
 
-  parser_get_args(parser);
+  ast->right = parser_get_args(parser);
 
-  ast->token = parser->current_t;
   parser_eat(parser, TOKEN_RPAREN);
-  printf("token: %d, %s\n", parser->current_t->type, parser->current_t->value);
 
   return ast;
 }
@@ -174,22 +176,34 @@ AST* parser_call_function(Parser* parser)
 AST* parser_get_args(Parser* parser)
 {
   Token* token = parser->current_t;
+  AST* ast = NULL;
+
   if(lexer_peek(parser->lexer) != ')')
   {
-    parser_eat(parser, TOKEN_ID);
-    parser_eat(parser, TOKEN_COMMA);
-    AST* ast = new_ast(NULL, parser_get_args(parser), token);
-
-    return ast;
+    if(token->type == TOKEN_STRING)
+    {
+      parser_eat(parser, TOKEN_STRING);
+      parser_eat(parser, TOKEN_COMMA);
+      ast = new_ast(NULL, parser_get_args(parser), token);
+    }
+    else
+    {
+      ast = new_ast(parser_expr(parser), NULL, new_token(TOKEN_EQUALS, "="));
+      parser_eat(parser, TOKEN_COMMA);
+      ast->right = parser_get_args(parser);
+    }
   }
   else
   {
-    parser_eat(parser, TOKEN_ID);
-    AST* ast = new_ast(NULL, NULL, token);
-    return ast;
+    if(token->type == TOKEN_STRING)
+    {
+      parser_eat(parser, TOKEN_STRING);
+      ast = new_ast(NULL, NULL, token);
+    }
+    else
+    {
+      ast = new_ast(parser_expr(parser), NULL, new_token(TOKEN_EQUALS, "="));
+    }
   }  
-}
-
-int parser_get_var(Parser* pareser, int hashed){
-
+  return ast;
 }
