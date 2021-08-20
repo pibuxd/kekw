@@ -59,6 +59,8 @@ Token* lexer_get_next_token(Lexer* lexer)
       case '*': return lexer_advance_with_token(lexer, new_token(TOKEN_MUL, lexer_get_current_char_as_string(lexer)));
       case '/': return lexer_advance_with_token(lexer, new_token(TOKEN_DIV, lexer_get_current_char_as_string(lexer)));
       case '=': return lexer_advance_with_token(lexer, new_token(TOKEN_EQUALS, lexer_get_current_char_as_string(lexer)));
+      case '>': return lexer_advance_with_token(lexer, new_token(TOKEN_GREATER, lexer_get_current_char_as_string(lexer)));
+      case '<': return lexer_advance_with_token(lexer, new_token(TOKEN_LESS, lexer_get_current_char_as_string(lexer)));
       case ';': return lexer_advance_with_token(lexer, new_token(TOKEN_SEMI, lexer_get_current_char_as_string(lexer)));
       case '(': return lexer_advance_with_token(lexer, new_token(TOKEN_LPAREN, lexer_get_current_char_as_string(lexer)));
       case ')': return lexer_advance_with_token(lexer, new_token(TOKEN_RPAREN, lexer_get_current_char_as_string(lexer)));

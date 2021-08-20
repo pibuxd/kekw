@@ -10,16 +10,18 @@ typedef struct TOKEN_STRUCT
     TOKEN_MINUS, // 2
     TOKEN_MUL, // 3
     TOKEN_DIV, // 4
-    TOKEN_EQUALS, // 5 
-    TOKEN_STRING, // 6
-    TOKEN_INT, // 7
-    TOKEN_SEMI, // 8
-    TOKEN_LPAREN, // 9
-    TOKEN_RPAREN, // 10
-    TOKEN_LBRACE, // 11
-    TOKEN_RBRACE, // 12
-    TOKEN_COMMA, // 13
-    TOKEN_EOF // 14
+    TOKEN_EQUALS, // 5
+    TOKEN_GREATER, // 6
+    TOKEN_LESS, // 7
+    TOKEN_STRING, // 8
+    TOKEN_INT, // 9
+    TOKEN_SEMI, // 10
+    TOKEN_LPAREN, // 11
+    TOKEN_RPAREN, // 12
+    TOKEN_LBRACE, // 13
+    TOKEN_RBRACE, // 14
+    TOKEN_COMMA, // 15
+    TOKEN_EOF // 16
   } type;
 
   char* value;
