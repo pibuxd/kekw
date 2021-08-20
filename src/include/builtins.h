@@ -1,7 +1,6 @@
 #ifndef BUILTINS_H
 #define BUILTINS_H
-// #include ""
 
-void builtin_print();
+void builtin_print(int* args, int args_size);
 
 #endif // !BUILTINS_H

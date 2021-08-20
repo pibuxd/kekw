@@ -34,6 +34,24 @@ void parser_eat(Parser* parser, int value)
   parser_get_next_token(parser);
 }
 
+AST* parser_condition(Parser* parser)
+{
+  AST* res = parser_expr(parser);
+
+  Token* token = parser->current_t;
+
+  if(token->type == TOKEN_GREATER)
+  {
+    parser_eat(parser, TOKEN_GREATER);
+  }
+  else if(token->type == TOKEN_LESS)
+  {
+    parser_eat(parser, TOKEN_LESS);
+  }
+  else return res;
+  return new_ast(res, parser_expr(parser), token);
+}
+
 AST* parser_expr(Parser* parser)
 {
   AST* res = parser_term(parser);
@@ -146,7 +164,7 @@ AST* parser_assignment_statement(Parser* parser)
   ast->token = parser->current_t;
   parser_eat(parser, TOKEN_EQUALS);
 
-  ast->right = parser_expr(parser);
+  ast->right = parser_condition(parser);
 
   return ast;
 }

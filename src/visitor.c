@@ -24,6 +24,20 @@ void visit(Parser* parser, AST* ast)
   }
 }
 
+int visit_condition(Parser* parser, AST* ast)
+{
+  if(ast->token->type == TOKEN_GREATER)
+  {
+    return visit_expr(parser, ast->left, 0) > visit_expr(parser, ast->right, 0);
+  }
+  else if(ast->token->type == TOKEN_LESS)
+  {
+    return visit_expr(parser, ast->left, 0) < visit_expr(parser, ast->right, 0);
+  }
+  else
+    return visit_expr(parser, ast, 0);
+}
+
 int visit_expr(Parser* parser, AST* ast, int val)
 {
   if(ast->token->type == TOKEN_PLUS)
@@ -58,7 +72,7 @@ void visit_assign_var(Parser* parser, AST* ast)
 {
   char* var_name = ast->left->token->value;
   int var_name_hashed = utils_hash_string(var_name);
-  parser->ids[var_name_hashed] = visit_expr(parser, ast->right, 0);
+  parser->ids[var_name_hashed] = visit_condition(parser, ast->right);
 }
 
 int visit_get_var(Parser* parser, char* name)

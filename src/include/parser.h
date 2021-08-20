@@ -22,6 +22,8 @@ void parser_get_next_token(Parser* parser);
 
 void parser_eat(Parser* parser, int value);
 
+AST* parser_condition(Parser* parser);
+
 AST* parser_expr(Parser* parser);
 
 AST* parser_term(Parser* parser);

@@ -6,6 +6,8 @@ void visit_compound(Parser* parser);
 
 void visit(Parser* parser, AST* ast);
 
+int visit_condition(Parser* parser, AST* ast);
+
 int visit_expr(Parser* parser, AST* ast, int val);
 
 void visit_assign_var(Parser* parser, AST* ast);
