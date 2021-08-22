@@ -1,3 +1,3 @@
 # Kekw
 
-> A C-like scripting language.
+nice lang with random syntax xd
