@@ -49,6 +49,7 @@ AST* parser_condition(Parser* parser)
     parser_eat(parser, TOKEN_LESS);
   }
   else return res;
+  
   return new_ast(res, parser_expr(parser), token);
 }
 
