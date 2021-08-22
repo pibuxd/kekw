@@ -15,9 +15,9 @@ int main(int argc, char* argv[])
     "var y = x < 5;\n" // 1
     "print((0 - 1) * (9 * 5 + 10 - 3)*5 + 1 - 2 - 3 * (0 - 1), x, y, \"XD\");\n"
 
-    "if y > x {\n"
-    "print(\"y >>>> x\");\n"
-    "}\n"
+    // "if y > x {\n"
+    // "print(\"y >>>> x\");\n"
+    // "};\n"
   );
   
   token = lexer_get_next_token(lexer);
