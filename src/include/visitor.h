@@ -4,7 +4,7 @@
 
 void visit_compound(Parser* parser);
 
-void visit(Parser* parser, AST* ast);
+void visit(Parser* parser, AST* ast, int i);
 
 int visit_condition(Parser* parser, AST* ast);
 

@@ -8,15 +8,19 @@ void visit_compound(Parser* parser)
 {
   for(int i = 1; i < parser->ast_size; i++)
   {
-    visit(parser, parser->ast[i]);
+    visit(parser, parser->ast[i], i);
   }
 }
 
-void visit(Parser* parser, AST* ast)
+void visit(Parser* parser, AST* ast, int i)
 {
   if(ast->token->type == TOKEN_EQUALS)
   {
     visit_assign_var(parser, ast);
+  }
+  else if(strcmp(ast->token->value, "if") == 0)
+  {
+
   }
   else
   {

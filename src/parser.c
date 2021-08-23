@@ -117,10 +117,7 @@ AST* parser_factor(Parser* parser)
     parser_eat(parser, TOKEN_RPAREN);
     return res;
   }
-  else if(token->type == TOKEN_ID)
-  {
-    printf("not yet: variable\n");
-  }
+
   printf("NO FACTOR");
   exit(-1);
 }
@@ -130,27 +127,27 @@ void parser_compound(Parser* parser)
   while(parser->current_t->type != TOKEN_EOF)
   {
     parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
-    parser->ast[parser->ast_size] = parser_statement(parser);
+    parser_statement(parser, parser->ast);
     parser->ast_size += 1;
     parser_eat(parser, TOKEN_SEMI);
   }
   parser_eat(parser, TOKEN_EOF);
 }
 
-AST* parser_statement(Parser* parser)
+void parser_statement(Parser* parser, AST** ast)
 {
-  AST* ast = calloc(1, sizeof(AST));
-  int hashed_value = utils_hash_string(parser->current_t->value);
   if(strcmp(parser->current_t->value, "var") == 0)
   {
-    ast = parser_assignment_statement(parser);
+    ast[parser->ast_size] = parser_assignment_statement(parser);
+  }
+  else if(strcmp(parser->current_t->value, "if") == 0)
+  {
+    parser_if(parser, ast);
   }
   else
   {
-    ast = parser_call_function(parser);
+    ast[parser->ast_size] = parser_call_function(parser);
   }
-
-  return ast;
 }
 
 AST* parser_assignment_statement(Parser* parser)
@@ -168,6 +165,11 @@ AST* parser_assignment_statement(Parser* parser)
   ast->right = parser_condition(parser);
 
   return ast;
+}
+
+void parser_if(Parser* parser, AST** ast)
+{
+  
 }
 
 AST* parser_call_function(Parser* parser)

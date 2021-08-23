@@ -32,9 +32,11 @@ AST* parser_factor(Parser* parser);
 
 void parser_compound(Parser* parser);
 
-AST* parser_statement(Parser* parser);
+void parser_statement(Parser* parser, AST** ast);
 
 AST* parser_assignment_statement(Parser* parser);
+
+void parser_if(Parser* parser, AST** ast);
 
 AST* parser_call_function(Parser* parser);
 
