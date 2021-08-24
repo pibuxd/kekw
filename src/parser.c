@@ -5,12 +5,15 @@
 #include <string.h>
 #include <ctype.h>
 
-Parser* new_parser(Lexer* lexer, Token* token){
+Parser* new_parser(Lexer* lexer, Token* token)
+{
   Parser* parser = calloc(1, sizeof(Parser));
   parser->lexer = lexer;
   parser->current_t = token;
   parser->ast = calloc(1, sizeof(AST));
   parser->ast_size = 1;
+  parser->function_size = calloc(1, sizeof(AST));
+  parser->functions_size = 1;
 
   parser->id_type = calloc(1000000, sizeof(int));
   parser->ids = calloc(1000000, sizeof(int));
@@ -140,6 +143,10 @@ void parser_statement(Parser* parser, AST** ast)
   {
     ast[parser->ast_size] = parser_assignment_statement(parser);
   }
+  else if(strcmp(parser->current_t->value, "func") == 0)
+  {
+    parser_define_function(parser, ast, parser->functions);
+  }
   else if(strcmp(parser->current_t->value, "if") == 0)
   {
     parser_if(parser, ast);
@@ -165,6 +172,11 @@ AST* parser_assignment_statement(Parser* parser)
   ast->right = parser_condition(parser);
 
   return ast;
+}
+
+void parser_define_function(Parser* parser, AST** ast, AST*** functions)
+{
+  
 }
 
 void parser_if(Parser* parser, AST** ast)

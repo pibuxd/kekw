@@ -5,15 +5,17 @@
 
 typedef struct PARSER_STRUCT
 {
-    Lexer* lexer;
-    Token* current_t;
-    AST** ast;
-    unsigned int ast_size;
-    int* id_type;
-    int* ids;
-    int* keywords;
-    int* function_it;
-    
+  Lexer* lexer;
+  Token* current_t;
+  AST** ast;
+  unsigned int ast_size;
+  AST*** functions;
+  unsigned int* function_size;
+  unsigned int functions_size;
+  int* id_type;
+  int* ids;
+  int* keywords;
+  int* function_it;
 } Parser;
 
 Parser* new_parser(Lexer* lexer, Token* token);
@@ -35,6 +37,8 @@ void parser_compound(Parser* parser);
 void parser_statement(Parser* parser, AST** ast);
 
 AST* parser_assignment_statement(Parser* parser);
+
+void parser_define_function(Parser* parser, AST** ast, AST*** functions);
 
 void parser_if(Parser* parser, AST** ast);
 
