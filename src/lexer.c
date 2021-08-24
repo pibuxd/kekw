@@ -6,6 +6,7 @@
 Lexer* new_lexer(char* content)
 {
   Lexer* lexer = calloc(1, sizeof(Lexer));
+  
   lexer->content = content;
   lexer->i = 0;
   lexer->current_c = content[lexer->i];
