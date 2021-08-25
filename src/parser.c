@@ -8,15 +8,26 @@
 Parser* new_parser(Lexer* lexer, Token* token)
 {
   Parser* parser = calloc(1, sizeof(Parser));
+
   parser->lexer = lexer;
   parser->current_t = token;
-  parser->ast = calloc(1, sizeof(AST));
-  parser->ast_size = 1;
-  parser->function_size = calloc(1, sizeof(AST));
-  parser->functions_size = 1;
 
-  parser->id_type = calloc(1000000, sizeof(int));
+  // MAIN
+  parser->ast = calloc(2, sizeof(AST));
+  parser->ast_size = 1;
   parser->ids = calloc(1000000, sizeof(int));
+  parser->ids_type = calloc(1000000, sizeof(int));
+  
+  // FUNCTIONS
+  parser->functions = calloc(2, sizeof(AST));
+  parser->functions_size = 1;
+  parser->func_size = calloc(2, sizeof(int));
+  parser->functions_ids_order = calloc(2, sizeof(int));
+  parser->functions_ids_order_size = calloc(2, sizeof(int));
+  parser->functions_it = calloc(1000000, sizeof(int));
+  parser->functions_ids = calloc(1000000, sizeof(int));
+  parser->functions_ids_type = calloc(1000000, sizeof(int));
+
   return parser;
 }
 
@@ -130,22 +141,22 @@ void parser_compound(Parser* parser)
   while(parser->current_t->type != TOKEN_EOF)
   {
     parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
-    parser_statement(parser, parser->ast);
+    parser_statement(parser, parser->ast, parser->ast_size);
     parser->ast_size += 1;
     parser_eat(parser, TOKEN_SEMI);
   }
   parser_eat(parser, TOKEN_EOF);
 }
 
-void parser_statement(Parser* parser, AST** ast)
+void parser_statement(Parser* parser, AST** ast, int i)
 {
   if(strcmp(parser->current_t->value, "var") == 0)
   {
-    ast[parser->ast_size] = parser_assignment_statement(parser);
+    ast[i] = parser_assignment_statement(parser);
   }
   else if(strcmp(parser->current_t->value, "func") == 0)
   {
-    parser_define_function(parser, ast, parser->functions);
+    parser_define_function(parser, ast);
   }
   else if(strcmp(parser->current_t->value, "if") == 0)
   {
@@ -153,7 +164,7 @@ void parser_statement(Parser* parser, AST** ast)
   }
   else
   {
-    ast[parser->ast_size] = parser_call_function(parser);
+    ast[i] = parser_call_function(parser);
   }
 }
 
@@ -174,21 +185,60 @@ AST* parser_assignment_statement(Parser* parser)
   return ast;
 }
 
-void parser_define_function(Parser* parser, AST** ast, AST*** functions)
+void parser_define_function(Parser* parser, AST** ast)
 {
-  
-}
+  parser_eat(parser, TOKEN_ID);
 
-void parser_if(Parser* parser, AST** ast)
-{
+  char* func_name = calloc(strlen(parser->current_t->value)+1, sizeof(char));
+  strcpy(func_name, parser->current_t->value);
+  int func_name_hash = utils_hash_string(func_name);
+
+  parser->functions_it = realloc(parser->functions_it, (parser->functions_size+1)*sizeof(AST));
+  parser->functions_it[func_name_hash] = parser->functions_size;
+  parser->functions_ids_order = realloc(parser->functions_ids_order, (parser->functions_size+1)*sizeof(AST));
+  parser->functions_ids_order[parser->functions_size] = calloc(2, sizeof(int));
+  parser->functions_ids_order_size[parser->functions_size] = 1;
+
+  parser_eat(parser, TOKEN_ID);
+  parser_eat(parser, TOKEN_LPAREN);
+
+  while(parser->current_t->type == TOKEN_ID)
+  {
+    char* arg_name = calloc(strlen(parser->current_t->value) + 1, sizeof(char));
+    strcpy(arg_name, parser->current_t->value);
+    int arg_name_hash = utils_hash_string(arg_name);
+
+    parser->functions_ids_order[parser->functions_size] = realloc(parser->functions_ids_order[parser->functions_size], (parser->functions_ids_order_size[parser->functions_size]+1)*sizeof(int));
+    parser->functions_ids_order[parser->functions_size][parser->functions_ids_order_size[parser->functions_size]] = arg_name_hash;
   
+    parser_eat(parser, TOKEN_ID);
+    parser->functions_ids_order_size[parser->functions_size] += 1; 
+    if(parser->current_t->type == TOKEN_COMMA)
+      parser_eat(parser, TOKEN_COMMA);
+  }
+
+  parser_eat(parser, TOKEN_RPAREN);
+  parser_eat(parser, TOKEN_LBRACE);
+
+  parser->functions = realloc(parser->functions, (parser->functions_size)+1*sizeof(AST));
+
+  while(parser->current_t->type != TOKEN_RBRACE)
+  {
+    parser->functions[parser->functions_size] = realloc(parser->functions[parser->functions_size], (parser->func_size[parser->functions_size]+1)*sizeof(int));
+    parser_statement(parser, parser->functions[parser->functions_size], parser->func_size[parser->functions_size]);
+    parser_eat(parser, TOKEN_SEMI);
+    parser->func_size[parser->functions_size] += 1;
+  }
+
+  parser_eat(parser, TOKEN_RBRACE);
+  parser->functions_size += 1;
 }
 
 AST* parser_call_function(Parser* parser)
 {
   AST* ast = calloc(1, sizeof(AST));
-
   ast->token = parser->current_t;
+
   if(parser->current_t->type == TOKEN_ID)
   {
     parser_eat(parser, TOKEN_ID);
@@ -206,37 +256,40 @@ AST* parser_call_function(Parser* parser)
   return ast;
 }
 
+void parser_if(Parser* parser, AST** ast)
+{
+  
+}
+
 AST* parser_get_args(Parser* parser)
 {
+  AST* ast = new_ast(NULL, NULL, NULL);
   Token* token = parser->current_t;
-  AST* ast = NULL;
 
-  if(lexer_peek(parser->lexer) != ')')
+  if(parser->current_t->type != TOKEN_RPAREN)
   {
     if(token->type == TOKEN_STRING)
     {
       parser_eat(parser, TOKEN_STRING);
-      parser_eat(parser, TOKEN_COMMA);
-      ast = new_ast(NULL, parser_get_args(parser), token);
-    }
-    else
-    {
-      ast = new_ast(parser_expr(parser), NULL, new_token(TOKEN_EQUALS, "="));
+      ast->token = token;
+      if(parser->current_t->type == TOKEN_COMMA)
+      {
       parser_eat(parser, TOKEN_COMMA);
       ast->right = parser_get_args(parser);
-    }
-  }
-  else
-  {
-    if(token->type == TOKEN_STRING)
-    {
-      parser_eat(parser, TOKEN_STRING);
-      ast = new_ast(NULL, NULL, token);
+      }
     }
     else
     {
-      ast = new_ast(parser_expr(parser), NULL, new_token(TOKEN_EQUALS, "="));
+      ast->left = parser_expr(parser);
+      ast->token = new_token(TOKEN_EQUALS, "=");
+
+      if(parser->current_t->type == TOKEN_COMMA)
+      {
+      parser_eat(parser, TOKEN_COMMA);
+      ast->right = parser_get_args(parser);
+      }
     }
-  }  
+  }
+
   return ast;
 }
