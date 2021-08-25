@@ -11,8 +11,8 @@ int main(int argc, char* argv[])
   // char* input = calloc(1000, sizeof(char));
   // fgets(input, 1000, stdin);
   lexer = new_lexer(
-    "func xd(x, y){\n"
-    "print(x+y);\n"
+    "func xd(a, b){\n"
+    "print(a+b);\n"
     "};\n"
     "var x = (0 - 1) * (9 * 5 + 10 - 3)*5 + 1 - 2 - 3 * (0 - 1);\n" // -258
     "var y = x < 5;\n" // 1
