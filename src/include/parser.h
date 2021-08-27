@@ -45,7 +45,7 @@ void parser_statement(Parser* parser, AST** ast, int i);
 
 AST* parser_assignment_statement(Parser* parser);
 
-void parser_define_function(Parser* parser, AST** ast);
+void parser_define_function(Parser* parser, int ast_it);
 
 AST* parser_call_function(Parser* parser);
 

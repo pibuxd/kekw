@@ -12,7 +12,7 @@ void visit_compound(Parser* parser)
   }
 }
 
-void visit(Parser* parser, AST* ast, int i)
+void visit(Parser* parser, AST* ast, int ast_it)
 {
   if(ast->token->type == TOKEN_EQUALS)
   {
@@ -21,6 +21,10 @@ void visit(Parser* parser, AST* ast, int i)
   else if(strcmp(ast->token->value, "if") == 0)
   {
 
+  }
+  else if(ast->token->type == TOKEN_FUNC)
+  {
+    visit_define_function(parser, ast);
   }
   else
   {
@@ -87,11 +91,31 @@ int visit_get_var(Parser* parser, char* name)
   return parser->ids[var_name_hashed];
 }
 
+void visit_define_function(Parser* parser, AST* ast)
+{
+  // char* func_name = calloc(strlen(ast->token->value)+1, sizeof(char));
+  // strcpy(func_name, ast->token->value);
+  // int func_name_hash = utils_hash_string(func_name);
+  // int func_it = parser->functions_it[func_name_hash];
+}
+
 void visit_call_function(Parser* parser, AST* ast)
 {
   if(strcmp(ast->token->value, "print") == 0)
   {
     visit_print_function(parser, ast->right);
+    return;
+  }
+  
+  char* func_name = calloc(strlen(ast->token->value)+1, sizeof(char));
+  strcpy(func_name, ast->token->value);
+  int func_name_hash = utils_hash_string(func_name);
+  int func_it = parser->functions_it[func_name_hash];
+  
+  for(int i = 1; i <= parser->func_size[func_it]; i++)
+  {
+    printf("HEIIIIIII\n");
+    visit(parser, parser->functions[func_it][i], i);
   }
 }
 

@@ -156,7 +156,7 @@ void parser_statement(Parser* parser, AST** ast, int i)
   }
   else if(strcmp(parser->current_t->value, "func") == 0)
   {
-    parser_define_function(parser, ast);
+    parser_define_function(parser, i);
   }
   else if(strcmp(parser->current_t->value, "if") == 0)
   {
@@ -185,13 +185,15 @@ AST* parser_assignment_statement(Parser* parser)
   return ast;
 }
 
-void parser_define_function(Parser* parser, AST** ast)
+void parser_define_function(Parser* parser, int ast_it)
 {
   parser_eat(parser, TOKEN_ID);
 
   char* func_name = calloc(strlen(parser->current_t->value)+1, sizeof(char));
   strcpy(func_name, parser->current_t->value);
   int func_name_hash = utils_hash_string(func_name);
+
+  parser->ast[ast_it] = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
 
   parser->functions_it = realloc(parser->functions_it, (parser->functions_size+1)*sizeof(AST));
   parser->functions_it[func_name_hash] = parser->functions_size;
