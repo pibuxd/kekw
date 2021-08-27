@@ -114,7 +114,6 @@ void visit_call_function(Parser* parser, AST* ast)
   
   for(int i = 1; i <= parser->func_size[func_it]; i++)
   {
-    printf("HEIIIIIII\n");
     visit(parser, parser->functions[func_it][i], i);
   }
 }
