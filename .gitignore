@@ -4,6 +4,7 @@ note*
 # VSCODE
 .history
 .vscode
+.DS_Store
 
 # Prerequisites
 *.d
