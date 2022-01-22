@@ -24,7 +24,7 @@ print((10*(7+94)) / g, bbb);
 output:
 ```txt
 AREA = 12
-18 1
+181
 ```
 
 ## Installing
