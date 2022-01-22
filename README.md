@@ -11,7 +11,7 @@ nice lang in development
 ```txt
 var g = 54;
 
-func xd(lenght, width){
+var xd = (lenght, width){
   print("AREA = ", lenght * width);
 };
 

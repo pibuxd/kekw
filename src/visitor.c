@@ -20,13 +20,13 @@ void visit(Parser* parser, AST* ast, int ast_it)
   {
     visit_assign_var(parser, ast);
   }
-  else if(strcmp(ast->token->value, "if") == 0)
-  {
-
-  }
   else if(ast->token->type == TOKEN_FUNC)
   {
     visit_define_function(parser, ast);
+  }
+  else if(strcmp(ast->token->value, "if") == 0)
+  {
+    // TODO
   }
   else
   {
@@ -83,7 +83,7 @@ int visit_expr(Parser* parser, AST* ast, int curr_val)
 
 // assigns global variable
 void visit_assign_var(Parser* parser, AST* ast)
-{
+{ 
   char* var_name = ast->left->token->value;
   int var_name_hashed = utils_hash_string(var_name);
   parser->ids[var_name_hashed] = visit_condition(parser, ast->right);

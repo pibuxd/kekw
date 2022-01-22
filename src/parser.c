@@ -162,14 +162,10 @@ void parser_compound(Parser* parser)
 // detect wich statements is it and parse it
 void parser_statement(Parser* parser, AST** ast, int i)
 {
-
   if(strcmp(parser->current_t->value, "var") == 0)
   {
-    ast[i] = parser_assignment_statement(parser);
-  }
-  else if(strcmp(parser->current_t->value, "func") == 0)
-  {
-    parser_define_function(parser, i);
+    // !will see if inteeger or function
+    parser_assignment_statement(parser, ast, i);
   }
   else if(strcmp(parser->current_t->value, "if") == 0)
   {
@@ -181,31 +177,33 @@ void parser_statement(Parser* parser, AST** ast, int i)
   }
 }
 
-// returns AST with new variable assignment
-AST* parser_assignment_statement(Parser* parser)
+// change AST with new variable assignment
+void parser_assignment_statement(Parser* parser, AST** ast, int i)
 {
-  AST* ast = calloc(1, sizeof(AST));
-
+  ast[i] = calloc(1, sizeof(AST));
   parser_eat(parser, TOKEN_ID);
   
-  ast->left = new_ast(NULL, NULL, parser->current_t);
+  Token* var_tok = parser->current_t;
   parser_eat(parser, TOKEN_ID);
 
-  ast->token = parser->current_t;
+  Token* tok = parser->current_t;
   parser_eat(parser, TOKEN_EQUALS);
 
-  ast->right = parser_condition(parser);
-
-  return ast;
+  // if LPAREN found, jump into defining function
+  if(parser->current_t->type == TOKEN_LPAREN)
+  {
+    return parser_define_function(parser, i, var_tok->value);
+  }
+  ast[i]->left = new_ast(NULL, NULL, var_tok);
+  ast[i]->token = tok;
+  ast[i]->right = parser_condition(parser);
 }
 
 // put new function to parser->functions...
-void parser_define_function(Parser* parser, int ast_it)
+void parser_define_function(Parser* parser, int ast_it, char* f_name)
 {
-  parser_eat(parser, TOKEN_ID);
-
-  char* func_name = calloc(strlen(parser->current_t->value)+1, sizeof(char));
-  strcpy(func_name, parser->current_t->value);
+  char* func_name = calloc(strlen(f_name)+1, sizeof(char));
+  strcpy(func_name, f_name);
   int func_name_hash = utils_hash_string(func_name);
 
   parser->ast[ast_it] = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
@@ -216,7 +214,6 @@ void parser_define_function(Parser* parser, int ast_it)
   parser->functions_ids_order[parser->functions_size] = calloc(2, sizeof(int));
   parser->functions_ids_order_size[parser->functions_size] = 1;
 
-  parser_eat(parser, TOKEN_ID);
   parser_eat(parser, TOKEN_LPAREN);
 
   while(parser->current_t->type == TOKEN_ID)
