@@ -1,33 +1,34 @@
 # Kekw
 
-nice lang with random syntax xd
+nice lang in development
 
 ## what have I done?
 + in src/main there is an example with the whole lang.
-+ + just inteeger variables and print()
-+ + functions are almost done
++ + inteeger variables, bool operators
++ + functions
++ + builtin print()
 
 ```txt
-func xd(a, b){
-  print("jd");
+var g = 54;
+
+func xd(lenght, width){
+  print("AREA = ", lenght * width);
 };
 
-var x = (0 - 1) * (9 * 5 + 10 - 3)*5 + 1 - 2 - 3 * (0 - 1);
-var y = x < 5;
-print((0 - 1) * (9 * 5 + 10 - 3)*5 + 1 - 2 - 3 * (0 - 1), x, y, \"XD\");
-xd(5, 7);
+xd(3, 4);
+var bbb = g > 50;
+
+print((10*(7+94)) / g, bbb);
 ```
 
 output:
 ```txt
--258
--258
-1
-XD
+AREA = 12
+18 1
 ```
 
 ## Installing
 ```sh
 make
-./kekw.out
+./kekw.out test.kekw
 ```
