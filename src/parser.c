@@ -18,7 +18,7 @@ Parser* new_parser(Lexer* lexer, Token* token)
   parser->ids = calloc(1000000, sizeof(int));
   parser->ids_type = calloc(1000000, sizeof(int));
   
-  // FUNCTIONS
+  // FUNCTIONS iterating starts at 1
   parser->functions = calloc(2, sizeof(AST));
   parser->functions_size = 1;
   parser->func_size = calloc(2, sizeof(int));
@@ -31,11 +31,13 @@ Parser* new_parser(Lexer* lexer, Token* token)
   return parser;
 }
 
+// get next token to parser
 void parser_get_next_token(Parser* parser)
 {
   parser->current_t = lexer_get_next_token(parser->lexer);
 }
 
+// eats token or warn
 void parser_eat(Parser* parser, int value)
 {
   if(parser->current_t->type != value)
@@ -48,6 +50,8 @@ void parser_eat(Parser* parser, int value)
   parser_get_next_token(parser);
 }
 
+// returns AST with parsed condition
+// CONDITION = EXPR > or < EXPR
 AST* parser_condition(Parser* parser)
 {
   AST* res = parser_expr(parser);
@@ -67,6 +71,8 @@ AST* parser_condition(Parser* parser)
   return new_ast(res, parser_expr(parser), token);
 }
 
+// returns AST with parsed expression
+// EXPR = TERM + or - TERM
 AST* parser_expr(Parser* parser)
 {
   AST* res = parser_term(parser);
@@ -89,6 +95,8 @@ AST* parser_expr(Parser* parser)
   return res;
 }
 
+// returns AST with parsed term
+// TERM = FACTOR * or / FACTOR
 AST* parser_term(Parser* parser)
 {
   AST* res = parser_factor(parser);
@@ -111,6 +119,8 @@ AST* parser_term(Parser* parser)
   return res;
 }
 
+// return AST with parsed int or variable in expression
+// FACTOR = INT or ID or ( EXPR )
 AST* parser_factor(Parser* parser)
 {
   Token* token = parser->current_t;
@@ -136,6 +146,7 @@ AST* parser_factor(Parser* parser)
   exit(-1);
 }
 
+// start parsing file
 void parser_compound(Parser* parser)
 {
   while(parser->current_t->type != TOKEN_EOF)
@@ -148,8 +159,10 @@ void parser_compound(Parser* parser)
   parser_eat(parser, TOKEN_EOF);
 }
 
+// detect wich statements is it and parse it
 void parser_statement(Parser* parser, AST** ast, int i)
 {
+  
   if(strcmp(parser->current_t->value, "var") == 0)
   {
     ast[i] = parser_assignment_statement(parser);
@@ -168,6 +181,7 @@ void parser_statement(Parser* parser, AST** ast, int i)
   }
 }
 
+// returns AST with new variable assignment
 AST* parser_assignment_statement(Parser* parser)
 {
   AST* ast = calloc(1, sizeof(AST));
@@ -185,6 +199,7 @@ AST* parser_assignment_statement(Parser* parser)
   return ast;
 }
 
+// put new function to parser->functions...
 void parser_define_function(Parser* parser, int ast_it)
 {
   parser_eat(parser, TOKEN_ID);
@@ -212,8 +227,9 @@ void parser_define_function(Parser* parser, int ast_it)
 
     parser->functions_ids_order[parser->functions_size] = realloc(parser->functions_ids_order[parser->functions_size], (parser->functions_ids_order_size[parser->functions_size]+1)*sizeof(int));
     parser->functions_ids_order[parser->functions_size][parser->functions_ids_order_size[parser->functions_size]] = arg_name_hash;
-  
+
     parser_eat(parser, TOKEN_ID);
+    
     parser->functions_ids_order_size[parser->functions_size] += 1; 
     if(parser->current_t->type == TOKEN_COMMA)
       parser_eat(parser, TOKEN_COMMA);
@@ -227,7 +243,7 @@ void parser_define_function(Parser* parser, int ast_it)
   while(parser->current_t->type != TOKEN_RBRACE)
   {
     parser->functions[parser->functions_size] = realloc(parser->functions[parser->functions_size], (parser->func_size[parser->functions_size]+1)*sizeof(int));
-    parser_statement(parser, parser->functions[parser->functions_size], parser->func_size[parser->functions_size]);
+    parser_statement(parser, parser->functions[parser->functions_size], parser->func_size[parser->functions_size]+1);
     parser_eat(parser, TOKEN_SEMI);
     parser->func_size[parser->functions_size] += 1;
   }
@@ -236,6 +252,7 @@ void parser_define_function(Parser* parser, int ast_it)
   parser->functions_size += 1;
 }
 
+// returns parsed whole void function
 AST* parser_call_function(Parser* parser)
 {
   AST* ast = calloc(1, sizeof(AST));
@@ -258,15 +275,12 @@ AST* parser_call_function(Parser* parser)
   return ast;
 }
 
-void parser_if(Parser* parser, AST** ast)
-{
-  
-}
-
+// returns arguments from called function to AST
 AST* parser_get_args(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, NULL);
   Token* token = parser->current_t;
+  printf("TOKKK: %s\n", token->value);
 
   if(parser->current_t->type != TOKEN_RPAREN)
   {
@@ -294,4 +308,10 @@ AST* parser_get_args(Parser* parser)
   }
 
   return ast;
+}
+
+// TODO: parse if
+void parser_if(Parser* parser, AST** ast)
+{
+  
 }
