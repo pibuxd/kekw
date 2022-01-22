@@ -3,15 +3,16 @@
 
 int utils_hash_string(char* str)
 {
-  int ans = 0;
-  int p = 1;
+  const int MOD = 999983;
+  int res = 0, p = 1;
+
   for(unsigned int i = 0; i < strlen(str); i++)
   {
-    ans += (str[i] - 'a' + 1) * p;
-    p *= 31;
+    res = (res + ((str[i] - 'a' + 1) * p) % MOD ) % MOD;
+    p = (p * 31) % MOD;
   }
 
-  return ans;
+  return res;
 }
 
 int utils_stoi(char* str)
