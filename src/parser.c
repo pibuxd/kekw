@@ -46,7 +46,7 @@ void parser_eat(Parser* parser, int value)
     exit(-1);
   }
 
-  printf("token: {%d, %s}\n", parser->current_t->type, parser->current_t->value);
+  // printf("token: {%d, %s}\n", parser->current_t->type, parser->current_t->value);
   parser_get_next_token(parser);
 }
 
@@ -162,7 +162,7 @@ void parser_compound(Parser* parser)
 // detect wich statements is it and parse it
 void parser_statement(Parser* parser, AST** ast, int i)
 {
-  
+
   if(strcmp(parser->current_t->value, "var") == 0)
   {
     ast[i] = parser_assignment_statement(parser);
@@ -280,7 +280,6 @@ AST* parser_get_args(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, NULL);
   Token* token = parser->current_t;
-  printf("TOKKK: %s\n", token->value);
 
   if(parser->current_t->type != TOKEN_RPAREN)
   {

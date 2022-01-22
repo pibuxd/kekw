@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   parser = new_parser(lexer, token);
 
   parser_compound(parser);
-  puts("\nvisiting...\n");
+  // puts("\nvisiting...\n");
   visit_compound(parser);
 
   free(filename);
