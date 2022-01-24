@@ -1,5 +1,7 @@
 # kekw files
 *.kekw
+test*.c
+test*.py
 
 # notes
 note*
