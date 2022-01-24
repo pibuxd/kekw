@@ -134,9 +134,9 @@ void visit_call_function(Parser* parser, AST* ast, int* local_variables, int* lo
 
   // assign local variables
   AST *v = ast->right;
-  for(int i = 1; i < parser->functions_ids_order_size[func_it]; i++){
-    parser->functions_ids[func_it][parser->functions_ids_order[func_it][i]] = visit_condition(parser, v->left, local_variables, local_variables_exi);
-    parser->functions_ids_exi[func_it][parser->functions_ids_order[func_it][i]] = 1;
+  for(int i = 1; i < parser->functions_args_order_size[func_it]; i++){
+    parser->functions_ids[func_it][parser->functions_args_order[func_it][i]] = visit_condition(parser, v->left, local_variables, local_variables_exi);
+    parser->functions_ids_exi[func_it][parser->functions_args_order[func_it][i]] = 1;
     v = v->right;
   }
 
@@ -147,9 +147,9 @@ void visit_call_function(Parser* parser, AST* ast, int* local_variables, int* lo
 
   // delete local variables
   v = ast->right;
-  for(int i = 1; i < parser->functions_ids_order_size[func_it]; i++){
-    parser->functions_ids[func_it][parser->functions_ids_order[func_it][i]] = 0;
-    parser->functions_ids[func_it][parser->functions_ids_order[func_it][i]] = 0;
+  for(int i = 1; i < parser->functions_args_order_size[func_it]; i++){
+    parser->functions_ids[func_it][parser->functions_args_order[func_it][i]] = 0;
+    parser->functions_ids[func_it][parser->functions_args_order[func_it][i]] = 0;
     v = v->right;
   }
 }

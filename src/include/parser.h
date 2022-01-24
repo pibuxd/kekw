@@ -2,6 +2,7 @@
 #define PARSER_H
 #include "ast.h"
 #include "lexer.h"
+#include "local_variables.h"
 
 typedef struct PARSER_STRUCT
 {
@@ -19,8 +20,8 @@ typedef struct PARSER_STRUCT
   AST*** functions;
   unsigned int functions_size;
   unsigned int* func_size;
-  int** functions_ids_order;
-  int* functions_ids_order_size;
+  int** functions_args_order;
+  int* functions_args_order_size;
   int* functions_it;
   int** functions_ids;
   int** functions_ids_exi;

@@ -5,7 +5,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
 // create new Parser
 Parser* new_parser(Lexer* lexer, Token* token)
 {
@@ -25,8 +24,8 @@ Parser* new_parser(Lexer* lexer, Token* token)
   parser->functions = calloc(2, sizeof(AST));
   parser->functions_size = 1;
   parser->func_size = calloc(2, sizeof(unsigned int));
-  parser->functions_ids_order = calloc(2, sizeof(int));
-  parser->functions_ids_order_size = calloc(2, sizeof(int));
+  parser->functions_args_order = calloc(2, sizeof(int));
+  parser->functions_args_order_size = calloc(2, sizeof(int));
   parser->functions_it = calloc(1000000, sizeof(int));
   parser->functions_ids = calloc(2, sizeof(int));
   parser->functions_ids_exi = calloc(2, sizeof(int));
@@ -218,12 +217,12 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 
   parser->functions_it = realloc(parser->functions_it, (parser->functions_size+1)*sizeof(int));
   parser->functions_it[func_name_hash] = parser->functions_size;
-  parser->functions_ids_order = realloc(parser->functions_ids_order, (parser->functions_size+1)*sizeof(AST));
+  parser->functions_args_order = realloc(parser->functions_args_order, (parser->functions_size+1)*sizeof(AST));
   parser->functions_ids = realloc(parser->functions_ids, (parser->functions_size+1)*sizeof(AST));
   parser->functions_ids[parser->functions_size] = calloc(1000000, sizeof(int));
   parser->functions_ids_exi[parser->functions_size] = calloc(1000000, sizeof(int));
-  parser->functions_ids_order[parser->functions_size] = calloc(2, sizeof(int));
-  parser->functions_ids_order_size[parser->functions_size] = 1;
+  parser->functions_args_order[parser->functions_size] = calloc(2, sizeof(int));
+  parser->functions_args_order_size[parser->functions_size] = 1;
 
   parser_eat(parser, TOKEN_LPAREN);
 
@@ -233,12 +232,12 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
     strcpy(arg_name, parser_current_token(parser)->value);
     int arg_name_hash = utils_hash_string(arg_name);
 
-    parser->functions_ids_order[parser->functions_size] = realloc(parser->functions_ids_order[parser->functions_size], (parser->functions_ids_order_size[parser->functions_size]+1)*sizeof(int));
-    parser->functions_ids_order[parser->functions_size][parser->functions_ids_order_size[parser->functions_size]] = arg_name_hash;
+    parser->functions_args_order[parser->functions_size] = realloc(parser->functions_args_order[parser->functions_size], (parser->functions_args_order_size[parser->functions_size]+1)*sizeof(int));
+    parser->functions_args_order[parser->functions_size][parser->functions_args_order_size[parser->functions_size]] = arg_name_hash;
 
     parser_eat(parser, TOKEN_ID);
     
-    parser->functions_ids_order_size[parser->functions_size] += 1; 
+    parser->functions_args_order_size[parser->functions_size] += 1; 
     if(parser_current_token(parser)->type == TOKEN_COMMA)
       parser_eat(parser, TOKEN_COMMA);
   }
