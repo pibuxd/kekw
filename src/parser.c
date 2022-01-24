@@ -5,6 +5,8 @@
 #include <string.h>
 #include <ctype.h>
 
+
+// create new Parser
 Parser* new_parser(Lexer* lexer, Token* token)
 {
   Parser* parser = calloc(1, sizeof(Parser));
@@ -39,6 +41,7 @@ void parser_get_next_token(Parser* parser)
   parser->current_t = lexer_get_next_token(parser->lexer);
 }
 
+// returns current Token of Parser
 Token* parser_current_token(Parser* parser){
   return parser->current_t;
 }
