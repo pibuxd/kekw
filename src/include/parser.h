@@ -12,6 +12,7 @@ typedef struct PARSER_STRUCT
   AST** ast;
   unsigned int ast_size;
   int* ids;
+  int* ids_exi;
   int* ids_type;
 
   // FUNCTIONS
@@ -22,6 +23,7 @@ typedef struct PARSER_STRUCT
   int* functions_ids_order_size;
   int* functions_it;
   int** functions_ids;
+  int** functions_ids_exi;
   int** functions_ids_type;
 } Parser;
 

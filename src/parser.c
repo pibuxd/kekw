@@ -16,17 +16,19 @@ Parser* new_parser(Lexer* lexer, Token* token)
   parser->ast = calloc(2, sizeof(AST));
   parser->ast_size = 1;
   parser->ids = calloc(1000000, sizeof(int));
+  parser->ids_exi = calloc(1000000, sizeof(int));
   parser->ids_type = calloc(1000000, sizeof(int));
   
   // FUNCTIONS iterating starts at 1
   parser->functions = calloc(2, sizeof(AST));
   parser->functions_size = 1;
-  parser->func_size = calloc(2, sizeof(int));
+  parser->func_size = calloc(2, sizeof(unsigned int));
   parser->functions_ids_order = calloc(2, sizeof(int));
   parser->functions_ids_order_size = calloc(2, sizeof(int));
   parser->functions_it = calloc(1000000, sizeof(int));
-  parser->functions_ids = calloc(1000000, sizeof(int));
-  parser->functions_ids_type = calloc(1000000, sizeof(int));
+  parser->functions_ids = calloc(2, sizeof(int));
+  parser->functions_ids_exi = calloc(2, sizeof(int));
+  parser->functions_ids_type = calloc(2, sizeof(int));
 
   return parser;
 }
@@ -155,7 +157,7 @@ void parser_compound(Parser* parser)
 {
   while(parser_current_token(parser)->type != TOKEN_EOF)
   {
-    parser->ast = realloc(parser->ast, parser->ast_size * sizeof(AST));
+    parser->ast = realloc(parser->ast, (parser->ast_size+1) * sizeof(AST));
     parser_statement(parser, parser->ast, parser->ast_size);
     parser->ast_size += 1;
     parser_eat(parser, TOKEN_SEMI);
@@ -168,20 +170,19 @@ void parser_statement(Parser* parser, AST** ast, int i)
 {
   if(strcmp(parser_current_token(parser)->value, "var") == 0)
   {
-    // !will see if inteeger or function
     parser_assignment_statement(parser, ast, i);
   }
   else if(strcmp(parser_current_token(parser)->value, "if") == 0)
   {
     parser_if(parser, ast);
   }
-  else
+  else // TODO to change (there can't be else)
   {
     ast[i] = parser_call_function(parser);
   }
 }
 
-// change AST with new variable assignment
+// change AST with new variable or function assignment
 void parser_assignment_statement(Parser* parser, AST** ast, int i)
 {
   ast[i] = calloc(1, sizeof(AST));
@@ -212,9 +213,12 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 
   parser->ast[ast_it] = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
 
-  parser->functions_it = realloc(parser->functions_it, (parser->functions_size+1)*sizeof(AST));
+  parser->functions_it = realloc(parser->functions_it, (parser->functions_size+1)*sizeof(int));
   parser->functions_it[func_name_hash] = parser->functions_size;
   parser->functions_ids_order = realloc(parser->functions_ids_order, (parser->functions_size+1)*sizeof(AST));
+  parser->functions_ids = realloc(parser->functions_ids, (parser->functions_size+1)*sizeof(AST));
+  parser->functions_ids[parser->functions_size] = calloc(1000000, sizeof(int));
+  parser->functions_ids_exi[parser->functions_size] = calloc(1000000, sizeof(int));
   parser->functions_ids_order[parser->functions_size] = calloc(2, sizeof(int));
   parser->functions_ids_order_size[parser->functions_size] = 1;
 
@@ -243,7 +247,7 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 
   while(parser_current_token(parser)->type != TOKEN_RBRACE)
   {
-    parser->functions[parser->functions_size] = realloc(parser->functions[parser->functions_size], (parser->func_size[parser->functions_size]+1)*sizeof(int));
+    parser->functions[parser->functions_size] = realloc(parser->functions[parser->functions_size], (parser->func_size[parser->functions_size]+1)*sizeof(AST));
     parser_statement(parser, parser->functions[parser->functions_size], parser->func_size[parser->functions_size]+1);
     parser_eat(parser, TOKEN_SEMI);
     parser->func_size[parser->functions_size] += 1;
@@ -256,7 +260,7 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 // returns parsed whole void function
 AST* parser_call_function(Parser* parser)
 {
-  AST* ast = calloc(1, sizeof(AST));
+  AST* ast = new_ast(NULL, NULL, NULL);
   ast->token = parser_current_token(parser);
 
   if(parser_current_token(parser)->type == TOKEN_ID)
