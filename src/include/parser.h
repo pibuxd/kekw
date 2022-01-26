@@ -2,7 +2,7 @@
 #define PARSER_H
 #include "ast.h"
 #include "lexer.h"
-#include "local_variables.h"
+#include "variables.h"
 
 typedef struct PARSER_STRUCT
 {
@@ -12,9 +12,7 @@ typedef struct PARSER_STRUCT
   // MAIN
   AST** ast;
   unsigned int ast_size;
-  int* ids;
-  int* ids_exi;
-  int* ids_type;
+  Variables* global_variables;
 
   // FUNCTIONS
   AST*** functions;
@@ -23,9 +21,7 @@ typedef struct PARSER_STRUCT
   int** functions_args_order;
   int* functions_args_order_size;
   int* functions_it;
-  int** functions_ids;
-  int** functions_ids_exi;
-  int** functions_ids_type;
+  Variables** local_variables;
 } Parser;
 
 Parser* new_parser(Lexer* lexer, Token* token);

@@ -8,28 +8,25 @@
 // create new Parser
 Parser* new_parser(Lexer* lexer, Token* token)
 {
+  // ! indexing starts at 1 (not 0)
   Parser* parser = calloc(1, sizeof(Parser));
 
   parser->lexer = lexer;
   parser->current_t = token;
 
   // MAIN
-  parser->ast = calloc(2, sizeof(AST));
-  parser->ast_size = 1;
-  parser->ids = calloc(1000000, sizeof(int));
-  parser->ids_exi = calloc(1000000, sizeof(int));
-  parser->ids_type = calloc(1000000, sizeof(int));
+  parser->ast = calloc(1, sizeof(AST*));
+  parser->ast_size = 0;
+  parser->global_variables = new_variables();
   
-  // FUNCTIONS iterating starts at 1
-  parser->functions = calloc(2, sizeof(AST));
-  parser->functions_size = 1;
-  parser->func_size = calloc(2, sizeof(unsigned int));
-  parser->functions_args_order = calloc(2, sizeof(int));
-  parser->functions_args_order_size = calloc(2, sizeof(int));
+  // FUNCTIONS
+  parser->functions = calloc(1, sizeof(AST));
+  parser->functions_size = 0;
+  parser->func_size = calloc(1, sizeof(unsigned int));
+  parser->functions_args_order = calloc(1, sizeof(int));
+  parser->functions_args_order_size = calloc(1, sizeof(int));
   parser->functions_it = calloc(1000000, sizeof(int));
-  parser->functions_ids = calloc(2, sizeof(int));
-  parser->functions_ids_exi = calloc(2, sizeof(int));
-  parser->functions_ids_type = calloc(2, sizeof(int));
+  parser->local_variables = calloc(1, sizeof(Variables));
 
   return parser;
 }
@@ -54,7 +51,6 @@ void parser_eat(Parser* parser, int value)
     exit(-1);
   }
 
-  // printf("token: {%d, %s}\n", parser_current_token(parser)->type, parser_current_token(parser)->value);
   parser_get_next_token(parser);
 }
 
@@ -159,11 +155,12 @@ void parser_compound(Parser* parser)
 {
   while(parser_current_token(parser)->type != TOKEN_EOF)
   {
-    parser->ast = realloc(parser->ast, (parser->ast_size+1) * sizeof(AST));
-    parser_statement(parser, parser->ast, parser->ast_size);
     parser->ast_size += 1;
+    parser->ast = realloc(parser->ast, (parser->ast_size+1)*sizeof(AST));
+    parser_statement(parser, parser->ast, parser->ast_size);
     parser_eat(parser, TOKEN_SEMI);
   }
+
   parser_eat(parser, TOKEN_EOF);
 }
 
@@ -187,7 +184,7 @@ void parser_statement(Parser* parser, AST** ast, int i)
 // change AST with new variable or function assignment
 void parser_assignment_statement(Parser* parser, AST** ast, int i)
 {
-  ast[i] = calloc(1, sizeof(AST));
+  ast[i] = new_ast(NULL, NULL, NULL);
   parser_eat(parser, TOKEN_ID);
   
   Token* var_tok = parser_current_token(parser);
@@ -201,62 +198,81 @@ void parser_assignment_statement(Parser* parser, AST** ast, int i)
   {
     return parser_define_function(parser, i, var_tok->value);
   }
+
   ast[i]->left = new_ast(NULL, NULL, var_tok);
   ast[i]->token = tok;
   ast[i]->right = parser_condition(parser);
+
+  // free(var_tok);
+  // free(tok);
 }
 
 // put new function to parser->functions...
 void parser_define_function(Parser* parser, int ast_it, char* f_name)
 {
+  parser->functions_size += 1;
+  int func_idx = parser->functions_size;
+
   char* func_name = calloc(strlen(f_name)+1, sizeof(char));
   strcpy(func_name, f_name);
   int func_name_hash = utils_hash_string(func_name);
 
   parser->ast[ast_it] = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
 
-  parser->functions_it = realloc(parser->functions_it, (parser->functions_size+1)*sizeof(int));
-  parser->functions_it[func_name_hash] = parser->functions_size;
-  parser->functions_args_order = realloc(parser->functions_args_order, (parser->functions_size+1)*sizeof(AST));
-  parser->functions_ids = realloc(parser->functions_ids, (parser->functions_size+1)*sizeof(AST));
-  parser->functions_ids[parser->functions_size] = calloc(1000000, sizeof(int));
-  parser->functions_ids_exi[parser->functions_size] = calloc(1000000, sizeof(int));
-  parser->functions_args_order[parser->functions_size] = calloc(2, sizeof(int));
-  parser->functions_args_order_size[parser->functions_size] = 1;
+  parser->functions_it = realloc(parser->functions_it, (func_idx+1)*sizeof(int));
+  parser->functions_it[func_name_hash] = func_idx;
+
+  parser->func_size = realloc(parser->func_size, (func_idx+1)*sizeof(int));
+  parser->func_size[func_idx] = 0;
+
+  parser->functions_args_order = realloc(parser->functions_args_order, (func_idx+1)*sizeof(int));
+  parser->functions_args_order[func_idx] = calloc(1, sizeof(int));
+  
+  parser->functions_args_order_size = realloc(parser->functions_args_order_size, 3 * (func_idx+1)*sizeof(int)); // don't know why have to multiply sizze by 3
+  parser->functions_args_order_size[func_idx] = 0;
+  
+  parser->local_variables = realloc(parser->local_variables, (func_idx+1)*sizeof(Variables));
+  parser->local_variables[func_idx] = new_variables();
+
+  parser->functions = realloc(parser->functions, (func_idx+1)*sizeof(AST));
+  parser->functions[func_idx] = calloc(1, sizeof(AST));
 
   parser_eat(parser, TOKEN_LPAREN);
 
   while(parser_current_token(parser)->type == TOKEN_ID)
   {
-    char* arg_name = calloc(strlen(parser_current_token(parser)->value) + 1, sizeof(char));
+    parser->functions_args_order_size[func_idx] += 1; 
+
+    char* arg_name = calloc(strlen(parser_current_token(parser)->value)+1, sizeof(char));
     strcpy(arg_name, parser_current_token(parser)->value);
     int arg_name_hash = utils_hash_string(arg_name);
 
-    parser->functions_args_order[parser->functions_size] = realloc(parser->functions_args_order[parser->functions_size], (parser->functions_args_order_size[parser->functions_size]+1)*sizeof(int));
-    parser->functions_args_order[parser->functions_size][parser->functions_args_order_size[parser->functions_size]] = arg_name_hash;
+    parser->functions_args_order[func_idx] = realloc(parser->functions_args_order[func_idx], (parser->functions_args_order_size[func_idx]+1)*sizeof(int));
+    parser->functions_args_order[func_idx][parser->functions_args_order_size[func_idx]] = arg_name_hash;
 
     parser_eat(parser, TOKEN_ID);
     
-    parser->functions_args_order_size[parser->functions_size] += 1; 
     if(parser_current_token(parser)->type == TOKEN_COMMA)
       parser_eat(parser, TOKEN_COMMA);
+
+    free(arg_name);
   }
 
   parser_eat(parser, TOKEN_RPAREN);
   parser_eat(parser, TOKEN_LBRACE);
 
-  parser->functions = realloc(parser->functions, (parser->functions_size)+1*sizeof(AST));
-
   while(parser_current_token(parser)->type != TOKEN_RBRACE)
   {
-    parser->functions[parser->functions_size] = realloc(parser->functions[parser->functions_size], (parser->func_size[parser->functions_size]+1)*sizeof(AST));
-    parser_statement(parser, parser->functions[parser->functions_size], parser->func_size[parser->functions_size]+1);
+    parser->func_size[func_idx] += 1;
+    
+    parser->functions[func_idx] = realloc(parser->functions[func_idx], (parser->func_size[func_idx]+1)*sizeof(AST));
+    parser_statement(parser, parser->functions[func_idx], parser->func_size[func_idx]);
     parser_eat(parser, TOKEN_SEMI);
-    parser->func_size[parser->functions_size] += 1;
   }
 
   parser_eat(parser, TOKEN_RBRACE);
-  parser->functions_size += 1;
+
+  // free(func_name);
 }
 
 // returns parsed whole void function
@@ -269,10 +285,7 @@ AST* parser_call_function(Parser* parser)
   {
     parser_eat(parser, TOKEN_ID);
   }
-  else
-  {
-    parser_eat(parser, TOKEN_STRING);
-  }  
+
   parser_eat(parser, TOKEN_LPAREN);
 
   ast->right = parser_get_args(parser);
@@ -302,7 +315,7 @@ AST* parser_get_args(Parser* parser)
     }
     else
     {
-      ast->left = parser_expr(parser);
+      ast->left = parser_condition(parser);
       ast->token = new_token(TOKEN_EQUALS, "=");
 
       if(parser_current_token(parser)->type == TOKEN_COMMA)

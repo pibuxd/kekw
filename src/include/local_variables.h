@@ -1,4 +1,0 @@
-#ifndef LOCAL_VARIABLES_H
-#define "LOCAL_VARIABLES_H"
- 
-#endif // !LOCAL_VARIABLES_H

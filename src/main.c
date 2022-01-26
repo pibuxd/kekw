@@ -15,6 +15,7 @@ char* read_file(char *filename){
 
   size_t filesize = (size_t)ftell(fp);
   char* filedata = calloc(filesize + 1, 1); // Add 1 for the terminating "nul" character
+
   rewind(fp);
   fread(filedata, 1, filesize, fp); // Read whole file
   fclose(fp);
