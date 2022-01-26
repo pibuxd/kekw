@@ -1,7 +1,7 @@
-CC=gcc
-EXE = kekw.out
+CC = gcc
+EXE = kekw
 SRC = $(wildcard src/*.c)
-CFLAGS = -g -O3
+CFLAGS = -g
 #OBJ = $(SRC:.c=.o)
 
 kekw:
