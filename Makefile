@@ -1,11 +1,10 @@
 CC = gcc
-EXE = kekw
+EXE = kekw.out
 SRC = $(wildcard src/*.c)
-CFLAGS = -g
-#OBJ = $(SRC:.c=.o)
+CFLAGS = -g -O3
 
 kekw:
 	$(CC) $(SRC) $(CFLAGS) -o $(EXE)
 
 clean:
-	rm *.out
+	rm -f *.out
