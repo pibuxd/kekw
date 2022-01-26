@@ -47,6 +47,7 @@ void parser_eat(Parser* parser, int value)
 {
   if(parser_current_token(parser)->type != value)
   {
+    lexer_print_error(parser->lexer);
     printf("expected token: %d, got: %d\n", value, parser_current_token(parser)->type);
     exit(-1);
   }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 
 Lexer* new_lexer(char* content)
 {
@@ -10,6 +11,7 @@ Lexer* new_lexer(char* content)
   lexer->content = content;
   lexer->i = 0;
   lexer->current_c = content[lexer->i];
+  lexer->current_line = 0;
 
   return lexer;
 }
@@ -35,6 +37,10 @@ void lexer_skip_whitespace(Lexer* lexer)
 {
   while(lexer->current_c == ' ' || lexer->current_c == 10) // 10 is Line Feed in ASCII
   {
+    if(lexer->current_c == 10)
+    {
+      lexer->current_line += 1;
+    }
     lexer_advance(lexer);
   }
 }
@@ -140,4 +146,9 @@ char* lexer_get_current_char_as_string(Lexer* lexer){
   str[1] = '\0';
 
   return str;
+}
+
+void lexer_print_error(Lexer* lexer)
+{
+  printf("error on line %d: ", lexer->current_line);
 }

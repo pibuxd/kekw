@@ -7,6 +7,7 @@ typedef struct LEXER_STRUCT
   char* content;
   char current_c; // current content[i] = current_c
   unsigned int i;
+  unsigned int current_line;
 } Lexer;
 
 Lexer* new_lexer(char* content);
@@ -28,5 +29,7 @@ char* lexer_collect_int(Lexer* lexer);
 Token* lexer_advance_with_token(Lexer* lexer, Token* token);
 
 char* lexer_get_current_char_as_string(Lexer* lexer);
+
+void lexer_print_error(Lexer* lexer);
 
 #endif //! LEXER_H
