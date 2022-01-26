@@ -30,7 +30,6 @@ char lexer_peek(Lexer* lexer)
     return lexer->content[lexer->i];
   else 
     return ' ';
-
 }
 
 void lexer_skip_whitespace(Lexer* lexer)
@@ -92,6 +91,7 @@ char* lexer_collect_string(Lexer* lexer)
     char* c = lexer_get_current_char_as_string(lexer);
     str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));
     strcat(str, c);
+    free(c);
 
     lexer_advance(lexer);
   }
@@ -110,6 +110,7 @@ char* lexer_collect_id(Lexer* lexer)
     char* c = lexer_get_current_char_as_string(lexer);
     str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));
     strcat(str, c);
+    free(c);
 
     lexer_advance(lexer);
   }
@@ -127,7 +128,8 @@ char* lexer_collect_int(Lexer* lexer)
     char* c = lexer_get_current_char_as_string(lexer);
     str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));
     strcat(str, c);
-
+    free(c);
+    
     lexer_advance(lexer);
   }
 
