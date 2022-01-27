@@ -108,8 +108,6 @@ int visit_get_var(Parser* parser, char* name, Variables* local_variables)
   {
     return parser->global_variables->values[var_name_hashed];
   }
-
-  free(var_name);
 }
 
 // define new function
