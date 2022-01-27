@@ -1,0 +1,7 @@
+1. add comments
+
+1. add function to Variable struct
+2. pass function as an argument
+3. function can return value
+
+1. add if, else, !, ==, !=
