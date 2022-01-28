@@ -20,13 +20,7 @@ Parser* new_parser(Lexer* lexer, Token* token)
   parser->global_variables = new_variables();
   
   // FUNCTIONS
-  parser->functions = calloc(1, sizeof(AST));
-  parser->functions_size = 0;
-  parser->func_size = calloc(1, sizeof(unsigned int));
-  parser->functions_args_order = calloc(1, sizeof(int));
-  parser->functions_args_order_size = calloc(1, sizeof(int));
-  parser->functions_it = calloc(1000000, sizeof(int));
-  parser->local_variables = calloc(1, sizeof(Variables));
+  parser->functions = new_functions();
 
   return parser;
 }
@@ -203,16 +197,13 @@ void parser_assignment_statement(Parser* parser, AST** ast, int i)
   ast[i]->left = new_ast(NULL, NULL, var_tok);
   ast[i]->token = tok;
   ast[i]->right = parser_condition(parser);
-
-  // free(var_tok);
-  // free(tok);
 }
 
 // put new function to parser->functions...
 void parser_define_function(Parser* parser, int ast_it, char* f_name)
 {
-  parser->functions_size += 1;
-  int func_idx = parser->functions_size;
+  parser->functions->functions_size += 1;
+  int func_idx = parser->functions->functions_size;
 
   char* func_name = calloc(strlen(f_name)+1, sizeof(char));
   strcpy(func_name, f_name);
@@ -220,36 +211,20 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 
   parser->ast[ast_it] = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
 
-  parser->functions_it = realloc(parser->functions_it, (func_idx+1)*sizeof(int));
-  parser->functions_it[func_name_hash] = func_idx;
-
-  parser->func_size = realloc(parser->func_size, (func_idx+1)*sizeof(int));
-  parser->func_size[func_idx] = 0;
-
-  parser->functions_args_order = realloc(parser->functions_args_order, (func_idx+1)*sizeof(int));
-  parser->functions_args_order[func_idx] = calloc(1, sizeof(int));
-  
-  parser->functions_args_order_size = realloc(parser->functions_args_order_size, 3 * (func_idx+1)*sizeof(int)); // don't know why have to multiply sizze by 3
-  parser->functions_args_order_size[func_idx] = 0;
-  
-  parser->local_variables = realloc(parser->local_variables, (func_idx+1)*sizeof(Variables));
-  parser->local_variables[func_idx] = new_variables();
-
-  parser->functions = realloc(parser->functions, (func_idx+1)*sizeof(AST));
-  parser->functions[func_idx] = calloc(1, sizeof(AST));
+  functions_add_new(parser->functions, func_idx, func_name_hash);
 
   parser_eat(parser, TOKEN_LPAREN);
 
   while(parser_current_token(parser)->type == TOKEN_ID)
   {
-    parser->functions_args_order_size[func_idx] += 1; 
+    parser->functions->functions_args_order_size[func_idx] += 1; 
 
     char* arg_name = calloc(strlen(parser_current_token(parser)->value)+1, sizeof(char));
     strcpy(arg_name, parser_current_token(parser)->value);
     int arg_name_hash = utils_hash_string(arg_name);
 
-    parser->functions_args_order[func_idx] = realloc(parser->functions_args_order[func_idx], (parser->functions_args_order_size[func_idx]+1)*sizeof(int));
-    parser->functions_args_order[func_idx][parser->functions_args_order_size[func_idx]] = arg_name_hash;
+    parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(int));
+    parser->functions->functions_args_order[func_idx][parser->functions->functions_args_order_size[func_idx]] = arg_name_hash;
 
     parser_eat(parser, TOKEN_ID);
     
@@ -264,16 +239,16 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 
   while(parser_current_token(parser)->type != TOKEN_RBRACE)
   {
-    parser->func_size[func_idx] += 1;
+    parser->functions->func_size[func_idx] += 1;
     
-    parser->functions[func_idx] = realloc(parser->functions[func_idx], (parser->func_size[func_idx]+1)*sizeof(AST));
-    parser_statement(parser, parser->functions[func_idx], parser->func_size[func_idx]);
+    parser->functions->functions[func_idx] = realloc(parser->functions->functions[func_idx], (parser->functions->func_size[func_idx]+1)*sizeof(AST));
+    parser_statement(parser, parser->functions->functions[func_idx], parser->functions->func_size[func_idx]);
     parser_eat(parser, TOKEN_SEMI);
   }
 
   parser_eat(parser, TOKEN_RBRACE);
 
-  // free(func_name);
+  free(func_name);
 }
 
 // returns parsed whole void function

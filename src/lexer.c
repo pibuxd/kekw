@@ -79,6 +79,11 @@ Token* lexer_get_next_token(Lexer* lexer)
   return new_token(TOKEN_EOF, "EOF");
 }
 
+int lexer_get_line(Lexer* lexer)
+{
+  return lexer->current_line;
+}
+
 char* lexer_collect_string(Lexer* lexer)
 {
   lexer_advance(lexer);
@@ -129,7 +134,7 @@ char* lexer_collect_int(Lexer* lexer)
     str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));
     strcat(str, c);
     free(c);
-    
+
     lexer_advance(lexer);
   }
 
@@ -152,5 +157,5 @@ char* lexer_get_current_char_as_string(Lexer* lexer){
 
 void lexer_print_error(Lexer* lexer)
 {
-  printf("error on line %d: ", lexer->current_line);
+  printf("error on line %d: ", lexer_get_line(lexer));
 }

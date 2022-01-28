@@ -87,8 +87,7 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
   char* var_name = ast->left->token->value;
   int var_name_hashed = utils_hash_string(var_name);
 
-  local_variables->values[var_name_hashed] = visit_condition(parser, ast->right, local_variables);
-  local_variables->exists[var_name_hashed] = 1;
+  variables_add_new(local_variables, var_name_hashed, visit_condition(parser, ast->right, local_variables));
 
   free(var_name);
 }
@@ -133,28 +132,25 @@ void visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   strcpy(func_name, ast->token->value);
 
   int func_name_hash = utils_hash_string(func_name);
-  int func_idx = parser->functions_it[func_name_hash];
+  int func_idx = parser->functions->functions_it[func_name_hash];
 
-  // assign local variables
+  // for recursive
+  // variables_delete_all(parser->functions->local_variables[func_idx]);
+
+  // assign local variables passed in arguments
   AST *v = ast->right;
-  for(int i = 1; i <= parser->functions_args_order_size[func_idx]; i++){
-    parser->local_variables[func_idx]->values[parser->functions_args_order[func_idx][i]] = visit_condition(parser, v->left, local_variables);
-    parser->local_variables[func_idx]->exists[parser->functions_args_order[func_idx][i]] = 1;
+  for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++){
+    variables_add_new(parser->functions->local_variables[func_idx], parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
     v = v->right;
   }
 
-  for(int i = 1; i <= parser->func_size[func_idx]; i++)
+  for(int i = 1; i <= parser->functions->func_size[func_idx]; i++)
   {
-    visit(parser, parser->functions[func_idx][i], i, parser->local_variables[func_idx]);
+    visit(parser, parser->functions->functions[func_idx][i], i, parser->functions->local_variables[func_idx]);
   }
 
-  // delete local variables
-  v = ast->right;
-  for(int i = 1; i <= parser->functions_args_order_size[func_idx]; i++){
-    parser->local_variables[func_idx]->values[parser->functions_args_order[func_idx][i]] = 0;
-    parser->local_variables[func_idx]->exists[parser->functions_args_order[func_idx][i]] = 0;
-    v = v->right;
-  }
+  // delete all local variables
+  variables_delete_all(parser->functions->local_variables[func_idx]);
 }
 
 // builtin print function
