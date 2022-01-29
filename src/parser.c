@@ -169,7 +169,7 @@ void parser_compound(Parser* parser)
   {
     parser->ast_size += 1;
     parser->ast = realloc(parser->ast, (parser->ast_size+1)*sizeof(AST));
-    parser_statement(parser, parser->ast, parser->ast_size);
+    parser->ast[parser->ast_size] = parser_statement(parser);
     parser_eat(parser, TOKEN_SEMI);
   }
 
@@ -177,42 +177,44 @@ void parser_compound(Parser* parser)
 }
 
 // detect wich statements is it and parse it
-void parser_statement(Parser* parser, AST** ast, int i)
+AST* parser_statement(Parser* parser)
 {
   if(strcmp(parser_current_token(parser)->value, "var") == 0)
   {
-    parser_assignment_statement(parser, ast, i);
+    return parser_assignment_statement(parser);
   }
   else if(strcmp(parser_current_token(parser)->value, "if") == 0)
   {
-    parser_if(parser, ast);
+    return parser_if(parser);
   }
   else if(strcmp(parser_current_token(parser)->value, "return") == 0)
   {
-    parser_return(parser, ast, i);
+    return parser_return(parser);
   }
   else // TODO to change (there can't be else)
   {
-    ast[i] = parser_call_function(parser);
+    return parser_call_function(parser);
   }
 }
 
 // change AST with return
-void parser_return(Parser* parser, AST** ast, int i)
+AST* parser_return(Parser* parser)
 {
-  ast[i] = new_ast(NULL, NULL, NULL);
+  AST* ast = new_ast(NULL, NULL, NULL);
 
   parser_eat(parser, TOKEN_ID);
 
-  ast[i]->left = new_ast(NULL, NULL, NULL);
-  ast[i]->token = new_token(TOKEN_RETURN, "return");
-  ast[i]->right = parser_condition(parser);
+  ast->left = new_ast(NULL, NULL, NULL);
+  ast->token = new_token(TOKEN_RETURN, "return");
+  ast->right = parser_condition(parser);
+
+  return ast;
 }
 
 // change AST with new variable or function assignment
-void parser_assignment_statement(Parser* parser, AST** ast, int i)
+AST* parser_assignment_statement(Parser* parser)
 {
-  ast[i] = new_ast(NULL, NULL, NULL);
+  AST* ast = new_ast(NULL, NULL, NULL);
   parser_eat(parser, TOKEN_ID);
   
   Token* var_tok = parser_current_token(parser);
@@ -224,16 +226,18 @@ void parser_assignment_statement(Parser* parser, AST** ast, int i)
   // if LPAREN found, jump into defining function
   if(parser_current_token(parser)->type == TOKEN_LPAREN)
   {
-    return parser_define_function(parser, i, var_tok->value);
+    return parser_define_function(parser, var_tok->value);
   }
 
-  ast[i]->left = new_ast(NULL, NULL, var_tok);
-  ast[i]->token = tok;
-  ast[i]->right = parser_condition(parser);
+  ast->left = new_ast(NULL, NULL, var_tok);
+  ast->token = tok;
+  ast->right = parser_condition(parser);
+
+  return ast;
 }
 
 // put new function to parser->functions...
-void parser_define_function(Parser* parser, int ast_it, char* f_name)
+AST* parser_define_function(Parser* parser, char* f_name)
 {
   parser->functions->functions_size += 1;
   int func_idx = parser->functions->functions_size;
@@ -242,7 +246,7 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
   strcpy(func_name, f_name);
   int func_name_hash = utils_hash_string(func_name);
 
-  parser->ast[ast_it] = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
+  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
 
   functions_add_new(parser->functions, func_idx, func_name_hash);
 
@@ -275,13 +279,14 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
     parser->functions->func_size[func_idx] += 1;
     
     parser->functions->functions[func_idx] = realloc(parser->functions->functions[func_idx], (parser->functions->func_size[func_idx]+1)*sizeof(AST));
-    parser_statement(parser, parser->functions->functions[func_idx], parser->functions->func_size[func_idx]);
+    parser->functions->functions[func_idx][parser->functions->func_size[func_idx]] = parser_statement(parser);
     parser_eat(parser, TOKEN_SEMI);
   }
 
   parser_eat(parser, TOKEN_RBRACE);
 
   free(func_name);
+  return ast;
 }
 
 // returns parsed whole void function
@@ -337,7 +342,7 @@ AST* parser_get_args(Parser* parser)
 }
 
 // TODO: parse if
-void parser_if(Parser* parser, AST** ast)
+AST* parser_if(Parser* parser)
 {
   
 }
