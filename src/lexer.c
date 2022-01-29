@@ -11,7 +11,7 @@ Lexer* new_lexer(char* content)
   lexer->content = content;
   lexer->i = 0;
   lexer->current_c = content[lexer->i];
-  lexer->current_line = 0;
+  lexer->current_line = 1;
 
   return lexer;
 }
