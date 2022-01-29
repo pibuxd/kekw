@@ -22,7 +22,9 @@ typedef struct TOKEN_STRUCT
     TOKEN_RBRACE, // 14
     TOKEN_COMMA, // 15
     TOKEN_FUNC, // 16
-    TOKEN_EOF // 17
+    TOKEN_CALL, // 17
+    TOKEN_RETURN, // 18
+    TOKEN_EOF // 19
   } type;
 
   char* value;

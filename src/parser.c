@@ -13,6 +13,7 @@ Parser* new_parser(Lexer* lexer, Token* token)
 
   parser->lexer = lexer;
   parser->current_t = token;
+  parser->previous_t = NULL;
 
   // MAIN
   parser->ast = calloc(1, sizeof(AST*));
@@ -28,6 +29,7 @@ Parser* new_parser(Lexer* lexer, Token* token)
 // get next token to parser
 void parser_get_next_token(Parser* parser)
 {
+  parser->previous_t = parser_current_token(parser);
   parser->current_t = lexer_get_next_token(parser->lexer);
 }
 
@@ -36,15 +38,24 @@ Token* parser_current_token(Parser* parser){
   return parser->current_t;
 }
 
+// returns previous Token of Parser
+Token* parser_previous_token(Parser* parser){
+  return parser->previous_t;
+}
+
 // eats token or warn
 void parser_eat(Parser* parser, int value)
 {
   if(parser_current_token(parser)->type != value)
   {
+    // print error with wrong parsed token
     lexer_print_error(parser->lexer);
-    printf("expected token: %d, got: %d\n", value, parser_current_token(parser)->type);
+    printf("PARSER - expected token: %d, got: %d\n", value, parser_current_token(parser)->type);
     exit(-1);
   }
+
+  // print parsed token (FOR DEBUG)
+  // printf("PARSER - token: %s\n", parser_current_token(parser)->value);
 
   parser_get_next_token(parser);
 }
@@ -54,7 +65,6 @@ void parser_eat(Parser* parser, int value)
 AST* parser_condition(Parser* parser)
 {
   AST* res = parser_expr(parser);
-
   Token* token = parser_current_token(parser);
 
   if(token->type == TOKEN_GREATER)
@@ -131,6 +141,12 @@ AST* parser_factor(Parser* parser)
   else if(token->type == TOKEN_ID)
   {
     parser_eat(parser, TOKEN_ID);
+
+    if(parser_current_token(parser)->type == TOKEN_LPAREN)
+    {
+      return parser_call_function(parser);
+    }
+
     return new_ast(NULL, NULL, token);
   }
   else if(token->type == TOKEN_LPAREN)
@@ -141,7 +157,8 @@ AST* parser_factor(Parser* parser)
     return res;
   }
 
-  printf("NO FACTOR");
+  lexer_print_error(parser->lexer);
+  printf("PARSER - no factor\n");
   exit(-1);
 }
 
@@ -170,10 +187,26 @@ void parser_statement(Parser* parser, AST** ast, int i)
   {
     parser_if(parser, ast);
   }
+  else if(strcmp(parser_current_token(parser)->value, "return") == 0)
+  {
+    parser_return(parser, ast, i);
+  }
   else // TODO to change (there can't be else)
   {
     ast[i] = parser_call_function(parser);
   }
+}
+
+// change AST with return
+void parser_return(Parser* parser, AST** ast, int i)
+{
+  ast[i] = new_ast(NULL, NULL, NULL);
+
+  parser_eat(parser, TOKEN_ID);
+
+  ast[i]->left = new_ast(NULL, NULL, NULL);
+  ast[i]->token = new_token(TOKEN_RETURN, "return");
+  ast[i]->right = parser_condition(parser);
 }
 
 // change AST with new variable or function assignment
@@ -255,17 +288,15 @@ void parser_define_function(Parser* parser, int ast_it, char* f_name)
 AST* parser_call_function(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, NULL);
-  ast->token = parser_current_token(parser);
 
   if(parser_current_token(parser)->type == TOKEN_ID)
   {
     parser_eat(parser, TOKEN_ID);
   }
 
+  ast->token = new_token(TOKEN_CALL, parser_previous_token(parser)->value);
   parser_eat(parser, TOKEN_LPAREN);
-
   ast->right = parser_get_args(parser);
-
   parser_eat(parser, TOKEN_RPAREN);
 
   return ast;

@@ -9,6 +9,7 @@ typedef struct PARSER_STRUCT
 {
   Lexer* lexer;
   Token* current_t;
+  Token* previous_t;
 
   // MAIN
   AST** ast;
@@ -25,6 +26,8 @@ void parser_get_next_token(Parser* parser);
 
 Token* parser_current_token(Parser* parser);
 
+Token* parser_previous_token(Parser* parser);
+
 void parser_eat(Parser* parser, int value);
 
 AST* parser_condition(Parser* parser);
@@ -38,6 +41,8 @@ AST* parser_factor(Parser* parser);
 void parser_compound(Parser* parser);
 
 void parser_statement(Parser* parser, AST** ast, int i);
+
+void parser_return(Parser* parser, AST** ast, int i);
 
 void parser_assignment_statement(Parser* parser, AST** ast, int i);
 
