@@ -23,8 +23,9 @@ typedef struct TOKEN_STRUCT
     TOKEN_COMMA, // 15
     TOKEN_FUNC, // 16
     TOKEN_CALL, // 17
-    TOKEN_RETURN, // 18
-    TOKEN_EOF // 19
+    TOKEN_IF, // 18
+    TOKEN_RETURN, // 19
+    TOKEN_EOF // 20
   } type;
 
   char* value;

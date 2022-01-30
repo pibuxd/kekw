@@ -11,7 +11,6 @@ Functions* new_functions()
   functions->functions_args_order = calloc(1, sizeof(int));
   functions->functions_args_order_size = calloc(1, sizeof(int));
   functions->functions_it = calloc(1000000, sizeof(int));
-  functions->local_variables = calloc(1, sizeof(Variables));
 
   return functions;
 }
@@ -30,9 +29,6 @@ void functions_add_new(Functions* functions, int func_idx, int func_name_hash)
   functions->functions_args_order_size = realloc(functions->functions_args_order_size, 3 * (func_idx+1)*sizeof(int)); // don't know why have to multiply sizze by 3
   functions->functions_args_order_size[func_idx] = 0;
   
-  functions->local_variables = realloc(functions->local_variables, (func_idx+1)*sizeof(Variables));
-  functions->local_variables[func_idx] = new_variables();
-
   functions->functions = realloc(functions->functions, (func_idx+1)*sizeof(AST));
   functions->functions[func_idx] = calloc(1, sizeof(AST));
 }

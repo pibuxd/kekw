@@ -12,7 +12,7 @@ void visit_compound(Parser* parser)
 
   for(int i = 1; i <= parser->ast_size; i++)
   {
-    res = visit(parser, parser->ast[i], i, parser->global_variables);
+    res = visit(parser, parser->ast[i], parser->global_variables);
     // if "return" captured
     if(res[0] == 1)
     {
@@ -22,7 +22,7 @@ void visit_compound(Parser* parser)
 }
 
 // visit line
-int* visit(Parser* parser, AST* ast, int ast_it, Variables* local_variables)
+int* visit(Parser* parser, AST* ast, Variables* local_variables)
 {
   int* res = calloc(2, sizeof(int));
   res[0] = 0, res[1] = 0;
@@ -42,7 +42,7 @@ int* visit(Parser* parser, AST* ast, int ast_it, Variables* local_variables)
   }
   else if(strcmp(ast->token->value, "if") == 0)
   {
-    // TODO
+    res = visit_if(parser, ast, local_variables);
   }
   else if(ast->token->type == TOKEN_CALL)
   {
@@ -156,19 +156,17 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   int func_name_hash = utils_hash_string(func_name);
   int func_idx = parser->functions->functions_it[func_name_hash];
 
-  // for recursive
-  // variables_delete_all(parser->functions->local_variables[func_idx]);
-
   // assign local variables passed in arguments
   AST *v = ast->right;
+  Variables* func_variables = new_variables();
   for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++){
-    variables_add_new(parser->functions->local_variables[func_idx], parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
+    variables_add_new(func_variables, parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
     v = v->right;
   }
 
   for(int i = 1; i <= parser->functions->func_size[func_idx]; i++)
   {
-    res = visit(parser, parser->functions->functions[func_idx][i], i, parser->functions->local_variables[func_idx]);
+    res = visit(parser, parser->functions->functions[func_idx][i], func_variables);
     
     if(res[0] == 1)
     {
@@ -178,7 +176,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 
   // delete all local variables
   ret:
-  variables_delete_all(parser->functions->local_variables[func_idx]);
+  variables_delete_all(func_variables);
   return res[1];
 }
 
@@ -201,4 +199,16 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 
   printf("\n");
   return 0;
+}
+
+int* visit_if(Parser* parser, AST* ast, Variables* local_variables)
+{
+  int* res = calloc(2, sizeof(int)); 
+
+  if(visit_condition(parser, ast->left, local_variables))
+  {
+    res = visit(parser, ast->right, local_variables);
+  }
+
+  return res;
 }

@@ -11,7 +11,6 @@ typedef struct FUNCTIONS_STRUCT
   int** functions_args_order;
   int* functions_args_order_size;
   int* functions_it;
-  Variables** local_variables;
 } Functions;
 
 Functions* new_functions();

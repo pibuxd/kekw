@@ -344,5 +344,17 @@ AST* parser_get_args(Parser* parser)
 // TODO: parse if
 AST* parser_if(Parser* parser)
 {
-  
+  AST* ast = new_ast(NULL, NULL, NULL);
+
+  parser_eat(parser, TOKEN_ID);
+
+  ast->token = new_token(TOKEN_IF, "if");
+
+  ast->left = parser_condition(parser);
+  parser_eat(parser, TOKEN_LBRACE);
+  ast->right = parser_statement(parser);
+  parser_eat(parser, TOKEN_SEMI);
+  parser_eat(parser, TOKEN_RBRACE);
+
+  return ast;
 }
