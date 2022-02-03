@@ -8,7 +8,7 @@ Functions* new_functions()
   functions->functions = calloc(1, sizeof(AST));
   functions->functions_size = 0;
   functions->func_size = calloc(1, sizeof(unsigned int));
-  functions->functions_args_order = calloc(1, sizeof(int));
+  functions->functions_args_order = calloc(1, sizeof(int*));
   functions->functions_args_order_size = calloc(1, sizeof(int));
   functions->functions_it = calloc(1000000, sizeof(int));
 
@@ -22,7 +22,7 @@ void functions_add_new(Functions* functions, unsigned int func_idx, int func_nam
   functions->func_size = realloc(functions->func_size, (func_idx+1)*sizeof(int));
   functions->func_size[func_idx] = 0;
 
-  functions->functions_args_order = realloc(functions->functions_args_order, (func_idx+1)*sizeof(int));
+  functions->functions_args_order = realloc(functions->functions_args_order, (func_idx+1)*sizeof(int*));
   functions->functions_args_order[func_idx] = calloc(1, sizeof(int));
   
   functions->functions_args_order_size = realloc(functions->functions_args_order_size, 3 * (func_idx+1)*sizeof(int)); // don't know why have to multiply sizze by 3
