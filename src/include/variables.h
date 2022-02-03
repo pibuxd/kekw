@@ -10,6 +10,8 @@ typedef struct VARIABLES_STRUCT
 
 Variables* new_variables();
 
+void free_variables(Variables* variables);
+
 void variables_add_new(Variables* variables, int name_hash, int val);
 
 void variables_delete(Variables* variables, int name_hash);

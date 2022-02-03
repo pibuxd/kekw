@@ -13,6 +13,14 @@ Variables* new_variables()
   return variables;
 }
 
+void free_variables(Variables* variables)
+{
+  free(variables->values);
+  free(variables->exists);
+  free(variables->types);
+  free(variables);
+}
+
 void variables_add_new(Variables* variables, int name_hash, int val)
 {
   variables->values[name_hash] = val;
@@ -27,9 +35,6 @@ void variables_delete(Variables* variables, int name_hash)
 
 void variables_delete_all(Variables* variables)
 {
-  free(variables->values);
-  free(variables->exists);
-  free(variables->types);
-  free(variables);
+  free_variables(variables);
   variables = new_variables();
 }

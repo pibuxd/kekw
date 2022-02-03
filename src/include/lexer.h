@@ -12,6 +12,8 @@ typedef struct LEXER_STRUCT
 
 Lexer* new_lexer(char* content);
 
+void free_lexer(Lexer* lexer);
+
 void lexer_advance(Lexer* lexer);
 
 char lexer_peek(Lexer* lexer);

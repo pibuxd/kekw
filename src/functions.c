@@ -15,6 +15,23 @@ Functions* new_functions()
   return functions;
 }
 
+void free_functions(Functions* functions)
+{
+  for(int i = 0; i <= functions->functions_size; i++)
+  {
+    for(int fi = 0; fi <= functions->func_size[i]; fi++)
+    {
+      free_ast(functions->functions[i][fi]);
+    }
+    free(functions->functions_args_order[i]);
+  }
+
+  free(functions->func_size);
+  free(functions->functions_args_order_size);
+  free(functions->functions_it);
+  free(functions);
+}
+
 void functions_add_new(Functions* functions, unsigned int func_idx, int func_name_hash)
 {
   functions->functions_it[func_name_hash] = func_idx;

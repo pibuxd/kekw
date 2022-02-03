@@ -9,3 +9,21 @@ AST* new_ast(AST* left, AST* right, Token* token){
   
   return ast;
 }
+
+void free_ast(AST* ast)
+{
+  if(ast->left != NULL)
+  {
+    free_ast(ast->left);
+  }
+  if(ast->right != NULL)
+  {
+    free_ast(ast->right);
+  }
+  if(ast->token != NULL)
+  {
+    free_token(ast->token);
+  }
+
+  free(ast);
+}

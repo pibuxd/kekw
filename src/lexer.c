@@ -16,6 +16,12 @@ Lexer* new_lexer(char* content)
   return lexer;
 }
 
+void free_lexer(Lexer* lexer)
+{
+  free(lexer->content);
+  free(lexer);
+}
+
 void lexer_advance(Lexer* lexer)
 {
   if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content)){

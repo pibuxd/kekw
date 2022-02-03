@@ -9,3 +9,9 @@ Token* new_token(int type, char* value)
 
   return token;
 }
+
+void free_token(Token* token)
+{
+  free(token->value);
+  free(token);
+}

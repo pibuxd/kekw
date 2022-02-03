@@ -27,6 +27,22 @@ Parser* new_parser(Lexer* lexer, Token* token)
   return parser;
 }
 
+void free_parser(Parser* parser)
+{
+  free_lexer(parser->lexer);
+  free_token(parser->current_t);
+  free_token(parser->previous_t);
+  free_variables(parser->global_variables);
+  free_functions(parser->functions);
+
+  for(int i = 1; i <= parser->ast_size; i++)
+  {
+    free_ast(parser->ast[i]);
+  }
+
+  free(parser);
+}
+
 // get next token to parser
 void parser_get_next_token(Parser* parser)
 {

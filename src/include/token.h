@@ -33,4 +33,6 @@ typedef struct TOKEN_STRUCT
 
 Token* new_token(int type, char* value);
 
+void free_token(Token* token);
+
 #endif // !TOKEN_H

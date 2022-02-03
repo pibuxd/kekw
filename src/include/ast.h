@@ -10,4 +10,6 @@ typedef struct AST_STRUCT {
 
 AST* new_ast(AST* left, AST* right, Token* token);
 
+void free_ast(AST* ast);
+
 #endif // !AST_H

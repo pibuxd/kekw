@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   char *filename = calloc(strlen(argv[1])+1, sizeof(char));
   strcpy(filename, argv[1]);
   char* filedata = read_file(filename);
-  // char* filedata = "var lol = (x){print(x+5);}; lol(2);";
+
   Lexer* lexer = NULL;
   Token* token = NULL;
   Parser* parser = NULL;
@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
   parser_compound(parser);
   visit_compound(parser);
 
-  // free(filename);
-  // free(filedata);
+  free(filename);
+  free(filedata);
   free(lexer);
   free(token);
   free(parser);
