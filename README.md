@@ -1,30 +1,27 @@
 # Kekw
 
-nice lang in development
+nice lang in development right now
 
 ## what have I done?
-+ in src/main there is an example with the whole lang.
-+ + inteeger variables, bool operators
-+ + functions
-+ + builtin print()
++ inteeger variables, bool operators
++ functions
++ builtin print() which also can pass string
 
 ```txt
-var g = 54;
+var sum = (n){
+  if n > 1 {
+    return n + sum(n-1);
+  };
 
-var xd = (lenght, width){
-  print("AREA = ", lenght * width);
+  return n;
 };
 
-xd(3, 4);
-var bbb = g > 50;
-
-print((10*(7+94)) / g, bbb);
+print("SUM = ", sum(6));
 ```
 
 output:
 ```txt
-AREA = 12
-181
+SUM = 21
 ```
 
 ## Installing

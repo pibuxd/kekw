@@ -1,9 +1,9 @@
-var x = (c){
-  if c > 1 {
-    return c + x(c-1);
+var sum = (n){
+  if n > 1 {
+    return n + sum(n-1);
   };
 
-  return c;
+  return n;
 };
 
-print(x(6));
+print("SUM = ", sum(6));
