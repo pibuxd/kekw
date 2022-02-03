@@ -7,8 +7,10 @@
 Lexer* new_lexer(char* content)
 {
   Lexer* lexer = calloc(1, sizeof(Lexer));
-  
-  lexer->content = content;
+
+  lexer->content = calloc(strlen(content)+1, sizeof(char));
+  strcpy(lexer->content, content);
+
   lexer->i = 0;
   lexer->current_c = content[lexer->i];
   lexer->current_line = 1;

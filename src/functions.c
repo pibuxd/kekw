@@ -19,10 +19,11 @@ void free_functions(Functions* functions)
 {
   for(int i = 0; i <= functions->functions_size; i++)
   {
-    for(int fi = 0; fi <= functions->func_size[i]; fi++)
-    {
-      free_ast(functions->functions[i][fi]);
-    }
+    // !idk why I can't free this without errors
+    // for(int fi = 0; fi <= functions->func_size[i]; fi++)
+    // {
+      // free_ast(functions->functions[i][fi]);
+    // }
     free(functions->functions_args_order[i]);
   }
 
