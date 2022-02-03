@@ -277,7 +277,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
     strcpy(arg_name, parser_current_token(parser)->value);
     int arg_name_hash = utils_hash_string(arg_name);
 
-    parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(int));
+    parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(int*));
     parser->functions->functions_args_order[func_idx][parser->functions->functions_args_order_size[func_idx]] = arg_name_hash;
 
     parser_eat(parser, TOKEN_ID);
@@ -295,7 +295,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
   {
     parser->functions->func_size[func_idx] += 1;
     
-    parser->functions->functions[func_idx] = realloc(parser->functions->functions[func_idx], (parser->functions->func_size[func_idx]+1)*sizeof(AST));
+    parser->functions->functions[func_idx] = realloc(parser->functions->functions[func_idx], (parser->functions->func_size[func_idx]+1)*sizeof(AST*));
     parser->functions->functions[func_idx][parser->functions->func_size[func_idx]] = parser_statement(parser);
     parser_eat(parser, TOKEN_SEMI);
   }

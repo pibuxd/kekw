@@ -16,9 +16,12 @@ void visit_compound(Parser* parser)
     // if "return" captured
     if(res[0] == 1)
     {
+      free(res);
       return;
     }
   }
+
+  free(res);
 }
 
 // visit line
@@ -174,9 +177,8 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
     }
   }
 
-  // delete all local variables
   ret:
-  variables_delete_all(func_variables);
+  free_variables(func_variables);
   return res[1];
 }
 
