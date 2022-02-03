@@ -1,0 +1,11 @@
+var x = (tt){
+  var u = 10;
+  return tt + u;
+};
+
+var z = (a, b){
+  var area = a*b;
+  return x(area);
+};
+
+print(z(4, 5));

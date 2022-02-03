@@ -1,0 +1,9 @@
+var x = (c){
+  if c > 1 {
+    return c + x(c-1);
+  };
+
+  return c;
+};
+
+print(x(6));

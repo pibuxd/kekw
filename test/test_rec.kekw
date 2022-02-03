@@ -1,0 +1,11 @@
+var add = (x){
+  var added = x + 1;
+  return added;
+};
+
+var f = (cnt){
+  print(cnt);
+  f(add(cnt));
+};
+
+f(1);

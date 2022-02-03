@@ -1,0 +1,12 @@
+var s = 10;
+
+var x = (){
+  if 5 > 4 {
+    var s = s + 5;
+  };
+
+  print("after if");
+};
+
+x();
+print(s);
