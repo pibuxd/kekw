@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 
 // create new Parser
 Parser* new_parser(Lexer* lexer, Token* token)
@@ -240,7 +241,7 @@ AST* parser_assignment_statement(Parser* parser)
 AST* parser_define_function(Parser* parser, char* f_name)
 {
   parser->functions->functions_size += 1;
-  int func_idx = parser->functions->functions_size;
+  unsigned int func_idx = parser->functions->functions_size;
 
   char* func_name = calloc(strlen(f_name)+1, sizeof(char));
   strcpy(func_name, f_name);

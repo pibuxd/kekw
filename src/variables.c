@@ -27,6 +27,9 @@ void variables_delete(Variables* variables, int name_hash)
 
 void variables_delete_all(Variables* variables)
 {
+  free(variables->values);
+  free(variables->exists);
+  free(variables->types);
   free(variables);
   variables = new_variables();
 }

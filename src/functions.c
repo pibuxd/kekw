@@ -15,9 +15,8 @@ Functions* new_functions()
   return functions;
 }
 
-void functions_add_new(Functions* functions, int func_idx, int func_name_hash)
+void functions_add_new(Functions* functions, unsigned int func_idx, int func_name_hash)
 {
-  functions->functions_it = realloc(functions->functions_it, (func_idx+1)*sizeof(int));
   functions->functions_it[func_name_hash] = func_idx;
 
   functions->func_size = realloc(functions->func_size, (func_idx+1)*sizeof(int));

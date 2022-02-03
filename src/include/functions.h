@@ -15,6 +15,6 @@ typedef struct FUNCTIONS_STRUCT
 
 Functions* new_functions();
 
-void functions_add_new(Functions* functions, int func_idx, int func_name_hash);
+void functions_add_new(Functions* functions, unsigned int func_idx, int func_name_hash);
 
 #endif // !FUNCTIONS_H

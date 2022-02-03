@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     puts("too much arguments given");
   }
 
-  char *filename = calloc(strlen(argv[1]), sizeof(char));
+  char *filename = calloc(strlen(argv[1])+1, sizeof(char));
   strcpy(filename, argv[1]);
   char* filedata = read_file(filename);
   // char* filedata = "var lol = (x){print(x+5);}; lol(2);";
