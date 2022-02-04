@@ -24,7 +24,9 @@ void free_functions(Functions* functions)
     {
       if(functions->functions[i][fi] != NULL)
         free_ast(functions->functions[i][fi]);
+    
     }
+    free(functions->functions[i]);
     free(functions->functions_args_order[i]);
   }
   

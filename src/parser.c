@@ -39,6 +39,7 @@ void free_parser(Parser* parser)
   {
     free_ast(parser->ast[i]);
   }
+  free(parser->ast);
 
   free(parser);
 }
@@ -185,7 +186,7 @@ void parser_compound(Parser* parser)
   while(parser_current_token(parser)->type != TOKEN_EOF)
   {
     parser->ast_size += 1;
-    parser->ast = realloc(parser->ast, (parser->ast_size+1)*sizeof(AST));
+    parser->ast = realloc(parser->ast, (parser->ast_size+1)*sizeof(AST*));
     parser->ast[parser->ast_size] = parser_statement(parser);
     parser_eat(parser, TOKEN_SEMI);
   }
