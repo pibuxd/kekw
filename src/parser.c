@@ -10,14 +10,14 @@
 Parser* new_parser(Lexer* lexer, Token* token)
 {
   // ! indexing starts at 1 (not 0)
-  Parser* parser = calloc(1, sizeof(Parser));
+  Parser* parser = malloc(1*sizeof(Parser));
 
   parser->lexer = lexer;
   parser->current_t = token;
   parser->previous_t = NULL;
 
   // MAIN
-  parser->ast = calloc(1, sizeof(AST*));
+  parser->ast = malloc(1*sizeof(AST*));
   parser->ast_size = 0;
   parser->global_variables = new_variables();
   
@@ -139,8 +139,9 @@ AST* parser_term(Parser* parser)
     {
       parser_eat(parser, TOKEN_DIV);
     }
-
     res = new_ast(res, parser_factor(parser), token);
+
+    free_token(token);
   }
 
   return res;
@@ -151,6 +152,7 @@ AST* parser_term(Parser* parser)
 AST* parser_factor(Parser* parser)
 {
   Token* token = parser_current_token(parser);
+
   if(token->type == TOKEN_INT)
   {
     parser_eat(parser, TOKEN_INT);
@@ -260,7 +262,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
   parser->functions->functions_size += 1;
   unsigned int func_idx = parser->functions->functions_size;
 
-  char* func_name = calloc(strlen(f_name)+1, sizeof(char));
+  char* func_name = malloc((strlen(f_name)+1)*sizeof(char));
   strcpy(func_name, f_name);
   int func_name_hash = utils_hash_string(func_name);
 
@@ -274,7 +276,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
   {
     parser->functions->functions_args_order_size[func_idx] += 1; 
 
-    char* arg_name = calloc(strlen(parser_current_token(parser)->value)+1, sizeof(char));
+    char* arg_name = malloc((strlen(parser_current_token(parser)->value)+1) * sizeof(char));
     strcpy(arg_name, parser_current_token(parser)->value);
     int arg_name_hash = utils_hash_string(arg_name);
 

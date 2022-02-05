@@ -6,9 +6,9 @@
 
 Lexer* new_lexer(char* content)
 {
-  Lexer* lexer = calloc(1, sizeof(Lexer));
+  Lexer* lexer = malloc(1*sizeof(Lexer));
 
-  lexer->content = calloc(strlen(content)+1, sizeof(char));
+  lexer->content = malloc((strlen(content)+1)*sizeof(char));
   strcpy(lexer->content, content);
 
   lexer->i = 0;
@@ -60,11 +60,26 @@ Token* lexer_get_next_token(Lexer* lexer)
       lexer_skip_whitespace(lexer);
     
     if(isdigit(lexer->current_c))
-      return new_token(TOKEN_INT, lexer_collect_int(lexer));
+    {
+      char* str = lexer_collect_int(lexer);
+      Token* tok = new_token(TOKEN_INT, str);
+      free(str);
+      return tok;
+    }
     else if(isalnum(lexer->current_c))
-      return new_token(TOKEN_ID, lexer_collect_id(lexer));
+    {
+      char* str = lexer_collect_id(lexer);
+      Token* tok = new_token(TOKEN_ID, str);
+      free(str);
+      return tok;
+    }
     else if(lexer->current_c == '"')
-      return new_token(TOKEN_STRING, lexer_collect_string(lexer));
+    {
+      char* str = lexer_collect_string(lexer);
+      Token* tok = new_token(TOKEN_STRING, str);
+      free(str);
+      return tok;
+    }
 
     switch(lexer->current_c)
     {
@@ -96,7 +111,7 @@ char* lexer_collect_string(Lexer* lexer)
 {
   lexer_advance(lexer);
 
-  char* str = calloc(1, sizeof(char));
+  char* str = malloc(1*sizeof(char));
   str[0] = '\0';
 
   while(lexer->current_c != '"')
@@ -115,7 +130,7 @@ char* lexer_collect_string(Lexer* lexer)
 
 char* lexer_collect_id(Lexer* lexer)
 {
-  char* str = calloc(1, sizeof(char));
+  char* str = malloc(1*sizeof(char));
   str[0] = '\0';
 
   while(isalnum(lexer->current_c))
@@ -133,7 +148,7 @@ char* lexer_collect_id(Lexer* lexer)
 
 char* lexer_collect_int(Lexer* lexer)
 {
-  char* str = calloc(1, sizeof(char));
+  char* str = malloc(1*sizeof(char));
   str[0] = '\0';
 
   while(isdigit(lexer->current_c))
