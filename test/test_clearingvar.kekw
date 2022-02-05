@@ -1,6 +1,6 @@
 var j = (){
-  var x = 10;
   print(x);
+  var x = 10;
 };
 
 j();
