@@ -8,9 +8,7 @@ Lexer* new_lexer(char* content)
 {
   Lexer* lexer = malloc(1*sizeof(Lexer));
 
-  lexer->content = malloc((strlen(content)+1)*sizeof(char));
-  strcpy(lexer->content, content);
-
+  lexer->content = strdup(content);
   lexer->i = 0;
   lexer->current_c = content[lexer->i];
   lexer->current_line = 1;

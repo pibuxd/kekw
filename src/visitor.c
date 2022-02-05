@@ -107,8 +107,7 @@ int visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variable
 // assigns variable
 void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 { 
-  char* var_name = malloc((strlen(ast->left->token->value)+1)*sizeof(char));
-  strcpy(var_name, ast->left->token->value);
+  char* var_name = strdup(ast->left->token->value);
   int var_name_hashed = utils_hash_string(var_name);
 
   variables_add_new(local_variables, var_name_hashed, visit_condition(parser, ast->right, local_variables));
@@ -118,8 +117,7 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 // gets variable (function is also variable)
 int visit_get_var(Parser* parser, char* name, Variables* local_variables)
 {
-  char* var_name = malloc((strlen(name)+1)*sizeof(char));
-  strcpy(var_name, name);
+  char* var_name = strdup(name);
   int var_name_hashed = utils_hash_string(var_name);
   free(var_name);
 
@@ -147,16 +145,14 @@ void visit_define_function(Parser* parser, AST* ast)
 // call functions
 int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 {
-  int* res = calloc(2, sizeof(int));
-
   if(strcmp(ast->token->value, "print") == 0)
   {
     return visit_print_function(parser, ast->right, local_variables);
   }
 
-  char* func_name = malloc((strlen(ast->token->value)+1)*sizeof(char));
-  strcpy(func_name, ast->token->value);
+  int* res = calloc(2, sizeof(int));
 
+  char* func_name = strdup(ast->token->value);
   int func_name_hash = utils_hash_string(func_name);
   int func_idx = parser->functions->functions_it[func_name_hash];
   free(func_name);
@@ -181,7 +177,10 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 
   ret:
   free_variables(func_variables);
-  return res[1];
+
+  int ret = res[1];
+  free(res);
+  return ret;
 }
 
 // builtin print function

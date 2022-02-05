@@ -262,8 +262,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
   parser->functions->functions_size += 1;
   unsigned int func_idx = parser->functions->functions_size;
 
-  char* func_name = malloc((strlen(f_name)+1)*sizeof(char));
-  strcpy(func_name, f_name);
+  char* func_name = strdup(f_name);
   int func_name_hash = utils_hash_string(func_name);
 
   AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
@@ -276,8 +275,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
   {
     parser->functions->functions_args_order_size[func_idx] += 1; 
 
-    char* arg_name = malloc((strlen(parser_current_token(parser)->value)+1) * sizeof(char));
-    strcpy(arg_name, parser_current_token(parser)->value);
+    char* arg_name = strdup(parser_current_token(parser)->value);
     int arg_name_hash = utils_hash_string(arg_name);
 
     parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(int*));
