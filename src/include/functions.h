@@ -8,7 +8,7 @@ typedef struct FUNCTIONS_STRUCT
   AST*** functions;
   unsigned int functions_size;
   unsigned int* func_size;
-  int** functions_args_order;
+  char*** functions_args_order;
   int* functions_args_order_size;
   int* functions_it;
 } Functions;

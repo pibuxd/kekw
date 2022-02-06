@@ -276,10 +276,9 @@ AST* parser_define_function(Parser* parser, char* f_name)
     parser->functions->functions_args_order_size[func_idx] += 1; 
 
     char* arg_name = strdup(parser_current_token(parser)->value);
-    int arg_name_hash = utils_hash_string(arg_name);
 
     parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(int*));
-    parser->functions->functions_args_order[func_idx][parser->functions->functions_args_order_size[func_idx]] = arg_name_hash;
+    parser->functions->functions_args_order[func_idx][parser->functions->functions_args_order_size[func_idx]] = strdup(arg_name);
 
     parser_eat(parser, TOKEN_ID);
     

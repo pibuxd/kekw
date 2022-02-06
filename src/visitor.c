@@ -108,9 +108,8 @@ int visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variable
 void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 { 
   char* var_name = strdup(ast->left->token->value);
-  int var_name_hashed = utils_hash_string(var_name);
 
-  variables_add_new(local_variables, var_name_hashed, visit_condition(parser, ast->right, local_variables));
+  variables_add(local_variables, var_name, visit_condition(parser, ast->right, local_variables));
   free(var_name);
 }
 
@@ -118,17 +117,24 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 int visit_get_var(Parser* parser, char* name, Variables* local_variables)
 {
   char* var_name = strdup(name);
-  int var_name_hashed = utils_hash_string(var_name);
-  free(var_name);
 
-  if(local_variables->exists[var_name_hashed] == 1)
+  int* var = variables_get(local_variables, var_name);
+  if(var[0] == 1)
   {
-    return local_variables->values[var_name_hashed];
+    int v = var[1];
+    free(var);
+    free(var_name);
+    return v;
   }
   else // global variable
   {
-    return parser->global_variables->values[var_name_hashed];
+    int* var = variables_get(parser->global_variables, var_name);
+    int v = var[1];
+    free(var);
+    free(var_name);
+    return v;
   }
+
 }
 
 // define new function
@@ -161,7 +167,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   AST *v = ast->right;
   Variables* func_variables = new_variables();
   for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++){
-    variables_add_new(func_variables, parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
+    variables_add(func_variables, parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
     v = v->right;
   }
 

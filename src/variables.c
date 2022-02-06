@@ -1,36 +1,92 @@
 #include "include/variables.h"
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <stdio.h>
 
 // create new Local Variables
 Variables* new_variables()
 {
   Variables* variables = malloc(1*sizeof(Variables));
   
-  variables->values = calloc(1000000, sizeof(int));
-  variables->exists = calloc(1000000, sizeof(int));
-  variables->types = calloc(1000000, sizeof(int));
+  variables->size = 50;
+  variables->list = malloc(variables->size*sizeof(Node*));
 
   return variables;
 }
 
 void free_variables(Variables* variables)
 {
-  free(variables->values);
-  free(variables->exists);
-  free(variables->types);
-  free(variables);
+  // free(variables->values);
+  // free(variables->exists);
+  // free(variables->types);
+  // free(variables);
 }
 
-void variables_add_new(Variables* variables, int name_hash, int val)
+int variables_hash(char* str, int size)
 {
-  variables->values[name_hash] = val;
-  variables->exists[name_hash] = 1;
+  const int mod = size;
+  int res = 0, p = 1;
+
+  for(unsigned int i = 0, strl = strlen(str); i < strl; i++)
+  {
+    res = (res + ((str[i] - 'a' + 1) * p) % mod ) % mod;
+    p = (p * 31) % mod;
+  }
+
+  return res;
+}
+
+void variables_add(Variables* variables, char* var_name, int val)
+{
+  // variables->size += 1;
+  // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
+
+  int var_name_hash = variables_hash(var_name, variables->size);
+  Node* list = variables->list[var_name_hash];
+  Node* node = list;
+  // puts("SDDD");
+
+  while(node != NULL)
+  {
+    if(strcmp(node->key, var_name) == 0) assert(1);
+    node = node->next;
+  }
+
+  node = malloc(1*sizeof(Node));
+  node->key = strdup(var_name);
+  node->value = val;
+  node->next = NULL;
+  // list
+  variables->list[var_name_hash] = node;
+}
+
+// returns {does_exists, value}
+int* variables_get(Variables* variables, char* var_name)
+{ 
+  int* res = calloc(2, sizeof(int));
+
+  int var_name_hash = variables_hash(var_name, variables->size);
+  Node* node = variables->list[var_name_hash];
+  // printf(":%p:\n", node);
+  while(node != NULL)
+  {
+      // puts("JDdddd");
+    if(strcmp(node->key, var_name) == 0)
+    {
+      res[0] = 1, res[1] = node->value;
+      return res;
+    }
+    node = node->next;
+  }
+
+  return res;
 }
 
 void variables_delete(Variables* variables, int name_hash)
 {
-  variables->values[name_hash] = 0;
-  variables->exists[name_hash] = 0;
+  // variables->values[name_hash] = 0;
+  // variables->exists[name_hash] = 0;
 }
 
 void variables_delete_all(Variables* variables)
