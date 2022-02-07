@@ -1,8 +1,6 @@
 #include "include/variables.h"
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <stdio.h>
 
 // create new Local Variables
 Variables* new_variables()
@@ -17,10 +15,11 @@ Variables* new_variables()
 
 void free_variables(Variables* variables)
 {
-  // free(variables->values);
-  // free(variables->exists);
-  // free(variables->types);
-  // free(variables);
+  for(int i = 0; i < variables->size; i++)
+  {
+    free(variables->list[i]);
+  }
+  free(variables);
 }
 
 int variables_hash(char* str, int size)
@@ -43,22 +42,28 @@ void variables_add(Variables* variables, char* var_name, int val)
   // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
 
   int var_name_hash = variables_hash(var_name, variables->size);
-  Node* list = variables->list[var_name_hash];
-  Node* node = list;
-  // puts("SDDD");
-
-  while(node != NULL)
+  if(variables->list[var_name_hash] == NULL)
   {
-    if(strcmp(node->key, var_name) == 0) assert(1);
+    variables->list[var_name_hash] = calloc(1, sizeof(Node));
+  }
+  
+  Node* node = variables->list[var_name_hash];
+
+  if(node == NULL) puts("KKK");
+  while(node->next != NULL)
+  {
     node = node->next;
+    if(strcmp(node->key, var_name) == 0)
+    {
+      node->value = val;
+      return;
+    }
   }
 
-  node = malloc(1*sizeof(Node));
-  node->key = strdup(var_name);
-  node->value = val;
-  node->next = NULL;
-  // list
-  variables->list[var_name_hash] = node;
+  node->next = malloc(1*sizeof(Node));
+  node->next->key = strdup(var_name);
+  node->next->value = val;
+  node->next->next = NULL;
 }
 
 // returns {does_exists, value}
@@ -68,16 +73,21 @@ int* variables_get(Variables* variables, char* var_name)
 
   int var_name_hash = variables_hash(var_name, variables->size);
   Node* node = variables->list[var_name_hash];
-  // printf(":%p:\n", node);
-  while(node != NULL)
+
+  if(node == NULL)
   {
-      // puts("JDdddd");
+    return res;
+  }
+
+  while(node->next != NULL)
+  {
+    node = node->next;
+
     if(strcmp(node->key, var_name) == 0)
     {
       res[0] = 1, res[1] = node->value;
       return res;
     }
-    node = node->next;
   }
 
   return res;
