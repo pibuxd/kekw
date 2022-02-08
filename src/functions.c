@@ -3,13 +3,13 @@
 
 Functions* new_functions()
 {
-  Functions* functions = malloc(1*sizeof(Functions));
+  Functions* functions = calloc(1, sizeof(Functions));
 
-  functions->functions = malloc(1*sizeof(AST*));
+  functions->functions = calloc(1, sizeof(AST*));
   functions->functions_size = 0;
-  functions->func_size = malloc(1*sizeof(unsigned int));
-  functions->functions_args_order = malloc(1*sizeof(char*));
-  functions->functions_args_order_size = malloc(1*sizeof(int));
+  functions->func_size = calloc(1, sizeof(unsigned int));
+  functions->functions_args_order = calloc(1, sizeof(char*));
+  functions->functions_args_order_size = calloc(1, sizeof(int));
   functions->functions_it = malloc(1000000*sizeof(int));
 
   return functions;
@@ -17,13 +17,18 @@ Functions* new_functions()
 
 void free_functions(Functions* functions)
 {
-  for(int i = 0; i <= functions->functions_size; i++)
+  free(functions->functions[0]);
+  free(functions->functions_args_order[0]);
+
+  for(int i = 1; i <= functions->functions_size; i++)
   {
-    // !idk why I can't free this without errors
-    for(int fi = 0; fi < functions->func_size[i]; fi++)
+    if(functions->func_size[i] == 0)
     {
-      if(functions->functions[i][fi] != NULL)
-        free_ast(functions->functions[i][fi]);
+      for(int fi = 0; fi <= functions->func_size[i]; fi++)
+      {
+        if(functions->functions[i][fi] != NULL)
+          free_ast(functions->functions[i][fi]);
+      }
     }
     
     free(functions->functions[i]);
