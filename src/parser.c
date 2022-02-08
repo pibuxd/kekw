@@ -140,8 +140,6 @@ AST* parser_term(Parser* parser)
       parser_eat(parser, TOKEN_DIV);
     }
     res = new_ast(res, parser_factor(parser), token);
-
-    free_token(token);
   }
 
   return res;
@@ -277,7 +275,7 @@ AST* parser_define_function(Parser* parser, char* f_name)
 
     char* arg_name = strdup(parser_current_token(parser)->value);
 
-    parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(int*));
+    parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(char*));
     parser->functions->functions_args_order[func_idx][parser->functions->functions_args_order_size[func_idx]] = strdup(arg_name);
 
     parser_eat(parser, TOKEN_ID);

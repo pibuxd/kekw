@@ -166,7 +166,8 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   // assign local variables passed in arguments
   AST *v = ast->right;
   Variables* func_variables = new_variables();
-  for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++){
+  for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++)
+  {
     variables_add(func_variables, parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
     v = v->right;
   }
