@@ -16,6 +16,8 @@ typedef struct VARIABLES_STRUCT
 
 Variables* new_variables();
 
+void free_node(Node* x);
+
 void free_variables(Variables* variables);
 
 int variables_hash(char* str, int size);

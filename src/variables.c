@@ -13,10 +13,25 @@ Variables* new_variables()
   return variables;
 }
 
+void free_node(Node* x)
+{
+  if(x->next != NULL)
+  {
+    free_node(x->next);
+  } 
+
+  free(x->next);
+}
+
 void free_variables(Variables* variables)
 {
   for(int i = 0; i < variables->size; i++)
   {
+    Node* node = variables->list[i];
+    if(node != NULL)
+    {
+      free_node(node->next);
+    }
     free(variables->list[i]);
   }
   free(variables);
@@ -42,6 +57,7 @@ void variables_add(Variables* variables, char* var_name, int val)
   // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
 
   int var_name_hash = variables_hash(var_name, variables->size);
+  // var_name_hash = 10;
   if(variables->list[var_name_hash] == NULL)
   {
     variables->list[var_name_hash] = calloc(1, sizeof(Node));
@@ -49,7 +65,6 @@ void variables_add(Variables* variables, char* var_name, int val)
   
   Node* node = variables->list[var_name_hash];
 
-  if(node == NULL) puts("KKK");
   while(node->next != NULL)
   {
     node = node->next;
@@ -72,6 +87,7 @@ int* variables_get(Variables* variables, char* var_name)
   int* res = calloc(2, sizeof(int));
 
   int var_name_hash = variables_hash(var_name, variables->size);
+  
   Node* node = variables->list[var_name_hash];
 
   if(node == NULL)
