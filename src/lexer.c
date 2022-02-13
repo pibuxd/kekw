@@ -32,10 +32,11 @@ void lexer_advance(Lexer* lexer)
 
 char lexer_peek(Lexer* lexer)
 {
-  if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content))
-    return lexer->content[lexer->i];
-  else 
-    return ' ';
+  return lexer->content[lexer->i+1];
+  // if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content))
+  //   return lexer->content[lexer->i+1];
+  // else 
+  //   return ' ';
 }
 
 void lexer_skip_whitespace(Lexer* lexer)
@@ -78,6 +79,8 @@ Token* lexer_get_next_token(Lexer* lexer)
       free(str);
       return tok;
     }
+    
+    char peek = lexer_peek(lexer);
 
     switch(lexer->current_c)
     {
@@ -85,9 +88,9 @@ Token* lexer_get_next_token(Lexer* lexer)
       case '-': return lexer_advance_with_token(lexer, new_token(TOKEN_MINUS, lexer_get_current_char_as_string(lexer)));
       case '*': return lexer_advance_with_token(lexer, new_token(TOKEN_MUL, lexer_get_current_char_as_string(lexer)));
       case '/': return lexer_advance_with_token(lexer, new_token(TOKEN_DIV, lexer_get_current_char_as_string(lexer)));
-      case '=': return lexer_advance_with_token(lexer, new_token(TOKEN_EQUALS, lexer_get_current_char_as_string(lexer)));
-      case '>': return lexer_advance_with_token(lexer, new_token(TOKEN_GREATER, lexer_get_current_char_as_string(lexer)));
-      case '<': return lexer_advance_with_token(lexer, new_token(TOKEN_LESS, lexer_get_current_char_as_string(lexer)));
+      case '=': return lexer_advance_with_token(lexer, new_token(peek == '=' ? TOKEN_EQ : TOKEN_EQUALS, peek == '=' ? "==" : "="));
+      case '>': return lexer_advance_with_token(lexer, new_token(peek == '=' ? TOKEN_GREATEREQ : TOKEN_GREATER, peek == '=' ? ">=" : ">"));
+      case '<': return lexer_advance_with_token(lexer, new_token(peek == '=' ? TOKEN_LESSEQ : TOKEN_LESS, peek == '=' ? "<=" : "<"));
       case ';': return lexer_advance_with_token(lexer, new_token(TOKEN_SEMI, lexer_get_current_char_as_string(lexer)));
       case '(': return lexer_advance_with_token(lexer, new_token(TOKEN_LPAREN, lexer_get_current_char_as_string(lexer)));
       case ')': return lexer_advance_with_token(lexer, new_token(TOKEN_RPAREN, lexer_get_current_char_as_string(lexer)));
@@ -98,6 +101,20 @@ Token* lexer_get_next_token(Lexer* lexer)
   }
 
   return new_token(TOKEN_EOF, "EOF");
+}
+
+Token* lexer_peek_next_token(Lexer* lexer)
+{
+  char __current_c = lexer->current_c;
+  unsigned int __i = lexer->i;
+  unsigned int __current_line = lexer->current_line;
+
+  Token* tok = lexer_get_next_token(lexer);
+  lexer->current_c = __current_c;
+  lexer->i = __i;
+  lexer->current_line = __current_line;
+
+  return tok;
 }
 
 int lexer_get_line(Lexer* lexer)
@@ -165,6 +182,8 @@ char* lexer_collect_int(Lexer* lexer)
 Token* lexer_advance_with_token(Lexer* lexer, Token* token){
   lexer_advance(lexer);
 
+  if(token->type >= 8 && token->type <= 10)
+    lexer_advance(lexer);
   return token;
 }
 

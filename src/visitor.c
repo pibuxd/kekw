@@ -54,53 +54,55 @@ int* visit(Parser* parser, AST* ast, Variables* local_variables)
 }
 
 // returns int from given condition in AST
-// !supported operations: +, -, *, /, , >, <
+// !supported operations: +, -, *, /, , >, <, <=, >=, ==
 int visit_condition(Parser* parser, AST* ast, Variables* local_variables)
 {
-  if(ast->token->type == TOKEN_GREATER)
+  switch (ast->token->type)
   {
+  case TOKEN_GREATER:
     return visit_expr(parser, ast->left, 0, local_variables) > visit_expr(parser, ast->right, 0, local_variables);
-  }
-  else if(ast->token->type == TOKEN_LESS)
-  {
+    break;
+  case TOKEN_GREATEREQ:
+    return visit_expr(parser, ast->left, 0, local_variables) >= visit_expr(parser, ast->right, 0, local_variables);
+    break;
+  case TOKEN_LESS:
     return visit_expr(parser, ast->left, 0, local_variables) < visit_expr(parser, ast->right, 0, local_variables);
-  }
-  else
+    break;
+  case TOKEN_LESSEQ:
+    return visit_expr(parser, ast->left, 0, local_variables) <= visit_expr(parser, ast->right, 0, local_variables);
+    break;
+  case TOKEN_EQ:
+    return visit_expr(parser, ast->left, 0, local_variables) == visit_expr(parser, ast->right, 0, local_variables);
+    break;
+  default:
     return visit_expr(parser, ast, 0, local_variables);
+  }
 }
 
 // visit expression calculates expr, supports inteegers and variables
 int visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variables)
 {
-  if(ast->token->type == TOKEN_PLUS)
+  switch (ast->token->type)
   {
+  case TOKEN_PLUS:
     curr_val += visit_expr(parser, ast->right, curr_val, local_variables) + visit_expr(parser, ast->left, curr_val, local_variables);
-  }
-  else if(ast->token->type == TOKEN_MINUS)
-  {
+    break;
+  case TOKEN_MINUS:
     curr_val += visit_expr(parser, ast->left, curr_val, local_variables) - visit_expr(parser, ast->right, curr_val, local_variables);
-  }
-  else if(ast->token->type == TOKEN_MUL)
-  {
+    break;
+  case TOKEN_MUL:
     curr_val += visit_expr(parser, ast->left, curr_val, local_variables) * visit_expr(parser, ast->right, curr_val, local_variables);
-  }
-  else if(ast->token->type == TOKEN_DIV)
-  {
+    break;
+  case TOKEN_DIV:
     curr_val += visit_expr(parser, ast->left, curr_val, local_variables) / visit_expr(parser, ast->right, curr_val, local_variables);
-  }
-  else if(ast->token->type == TOKEN_INT)
-  {
+    break;
+  case TOKEN_INT:
     return utils_stoi(ast->token->value);
-  }
-  else if(ast->token->type == TOKEN_ID)
-  {
+  case TOKEN_ID:
     return visit_get_var(parser, ast->token->value, local_variables);
-  }
-  else if(ast->token->type == TOKEN_CALL)
-  {
+  case TOKEN_CALL:
     return visit_call_function(parser, ast, local_variables);
   }
-
   return curr_val;
 }
 

@@ -86,7 +86,8 @@ void variables_add(Variables* variables, char* var_name, int val)
 int* variables_get(Variables* variables, char* var_name)
 { 
   int* res = calloc(2, sizeof(int));
-
+  res[1] = 10;
+  res[0] = 1;
   int var_name_hash = variables_hash(var_name, variables->size);
   
   Node* node = variables->list[var_name_hash];

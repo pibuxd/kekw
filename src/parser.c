@@ -85,15 +85,26 @@ AST* parser_condition(Parser* parser)
   AST* res = parser_expr(parser);
   Token* token = parser_current_token(parser);
 
-  if(token->type == TOKEN_GREATER)
+  switch (token->type)
   {
+  case TOKEN_GREATER:
     parser_eat(parser, TOKEN_GREATER);
-  }
-  else if(token->type == TOKEN_LESS)
-  {
+    break;
+  case TOKEN_GREATEREQ:
+    parser_eat(parser, TOKEN_GREATEREQ);
+    break;
+  case TOKEN_LESS:
     parser_eat(parser, TOKEN_LESS);
+    break;
+  case TOKEN_LESSEQ:
+    parser_eat(parser, TOKEN_LESSEQ);
+    break;
+  case TOKEN_EQ:
+    parser_eat(parser, TOKEN_EQ);
+    break;
+  default:
+    return res;
   }
-  else return res;
   
   return new_ast(res, parser_expr(parser), token);
 }
@@ -209,7 +220,7 @@ AST* parser_statement(Parser* parser)
   {
     return parser_return(parser);
   }
-  else // TODO to change (there can't be else)
+  else if(lexer_peek_next_token(parser->lexer)->type == TOKEN_LPAREN)
   {
     return parser_call_function(parser);
   }
@@ -356,7 +367,6 @@ AST* parser_get_args(Parser* parser)
   return ast;
 }
 
-// TODO: parse if
 AST* parser_if(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, NULL);

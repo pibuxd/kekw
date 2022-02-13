@@ -22,6 +22,8 @@ void lexer_skip_whitespace(Lexer* lexer);
 
 Token* lexer_get_next_token(Lexer* lexer);
 
+Token* lexer_peek_next_token(Lexer* lexer);
+
 int lexer_get_line(Lexer* lexer);
 
 char* lexer_collect_string(Lexer* lexer);
