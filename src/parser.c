@@ -367,6 +367,7 @@ AST* parser_get_args(Parser* parser)
   return ast;
 }
 
+// returns AST with parsed if
 AST* parser_if(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, NULL);

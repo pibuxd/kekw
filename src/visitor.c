@@ -54,7 +54,7 @@ int* visit(Parser* parser, AST* ast, Variables* local_variables)
 }
 
 // returns int from given condition in AST
-// !supported operations: +, -, *, /, , >, <, <=, >=, ==
+// ! supported operations: +, -, *, /, , >, <, <=, >=, ==
 int visit_condition(Parser* parser, AST* ast, Variables* local_variables)
 {
   switch (ast->token->type)
@@ -136,7 +136,6 @@ int visit_get_var(Parser* parser, char* name, Variables* local_variables)
     free(var_name);
     return v;
   }
-
 }
 
 // define new function

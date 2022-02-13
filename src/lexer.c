@@ -22,6 +22,7 @@ void free_lexer(Lexer* lexer)
   free(lexer);
 }
 
+// just advance Lexer
 void lexer_advance(Lexer* lexer)
 {
   if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content)){
@@ -30,15 +31,13 @@ void lexer_advance(Lexer* lexer)
   }
 }
 
+// peek char without advancing Lexer
 char lexer_peek(Lexer* lexer)
 {
   return lexer->content[lexer->i+1];
-  // if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content))
-  //   return lexer->content[lexer->i+1];
-  // else 
-  //   return ' ';
 }
 
+// skip whitespaces with advancing Lexer
 void lexer_skip_whitespace(Lexer* lexer)
 {
   while(lexer->current_c == ' ' || lexer->current_c == 10) // 10 is Line Feed in ASCII
@@ -51,6 +50,7 @@ void lexer_skip_whitespace(Lexer* lexer)
   }
 }
 
+// returns next Token and advance Lexer
 Token* lexer_get_next_token(Lexer* lexer)
 {
   while(lexer->current_c != '\0' && lexer->i < strlen(lexer->content))
@@ -103,6 +103,7 @@ Token* lexer_get_next_token(Lexer* lexer)
   return new_token(TOKEN_EOF, "EOF");
 }
 
+// returns next Token but without advancing Lexer
 Token* lexer_peek_next_token(Lexer* lexer)
 {
   char __current_c = lexer->current_c;
@@ -143,6 +144,7 @@ char* lexer_collect_string(Lexer* lexer)
   return str;
 }
 
+// returns string with collected id from Lexer
 char* lexer_collect_id(Lexer* lexer)
 {
   char* str = malloc(1*sizeof(char));
@@ -161,6 +163,7 @@ char* lexer_collect_id(Lexer* lexer)
   return str;
 }
 
+// returns string with collected int from Lexer
 char* lexer_collect_int(Lexer* lexer)
 {
   char* str = malloc(1*sizeof(char));
@@ -179,14 +182,16 @@ char* lexer_collect_int(Lexer* lexer)
   return str;
 }
 
+// returns Token after advancing Lexers
 Token* lexer_advance_with_token(Lexer* lexer, Token* token){
   lexer_advance(lexer);
 
-  if(token->type >= 8 && token->type <= 10)
+  if(8 <= token->type && token->type <= 10) // skip Token created from two separated eg. >= ('>' + '=')
     lexer_advance(lexer);
   return token;
 }
 
+// XD
 char* lexer_get_current_char_as_string(Lexer* lexer){
   char* str = calloc(2, sizeof(char));
   str[0] = lexer->current_c;
