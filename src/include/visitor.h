@@ -1,10 +1,11 @@
 #ifndef VISITOR_H
 #define VISITOR_H
 #include "parser.h"
+#include "return.h"
 
 void visit_compound(Parser* parser);
 
-int* visit(Parser* parser, AST* ast, Variables* local_variables);
+Return visit(Parser* parser, AST* ast, Variables* local_variables);
 
 int visit_condition(Parser* parser, AST* ast, Variables* local_variables);
 
@@ -20,6 +21,6 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables);
 
 int visit_print_function(Parser* parser, AST* ast, Variables* local_variables);
 
-int* visit_if(Parser* parser, AST* ast, Variables* local_variables);
+Return visit_if(Parser* parser, AST* ast, Variables* local_variables);
 
 #endif // !VISITOR_H

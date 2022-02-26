@@ -7,26 +7,23 @@
 // main function
 void visit_compound(Parser* parser)
 {
-  int* res = calloc(2, sizeof(int));
+  Return res = new_return();
 
   for(int i = 1; i <= parser->ast_size; i++)
   {
     res = visit(parser, parser->ast[i], parser->global_variables);
     // if "return" captured
-    if(res[0] == 1)
+    if(res.isreturned == 1)
     {
-      free(res);
       return;
     }
   }
-
-  free(res);
 }
 
 // visit line
-int* visit(Parser* parser, AST* ast, Variables* local_variables)
+Return visit(Parser* parser, AST* ast, Variables* local_variables)
 {
-  int* res = calloc(2, sizeof(int));
+  Return res = new_return();
 
   if(ast->token->type == TOKEN_EQUALS)
   {
@@ -38,8 +35,8 @@ int* visit(Parser* parser, AST* ast, Variables* local_variables)
   }
   else if(ast->token->type == TOKEN_RETURN)
   {
-    res[0] = 1;
-    res[1] = visit_condition(parser, ast->right, local_variables);
+    res.isreturned = 1;
+    res.value = visit_condition(parser, ast->right, local_variables);
   }
   else if(strcmp(ast->token->value, "if") == 0)
   {
@@ -157,7 +154,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
     return visit_print_function(parser, ast->right, local_variables);
   }
 
-  int* res = calloc(2, sizeof(int));
+  Return res = new_return();
 
   char* func_name = strdup(ast->token->value);
   int func_name_hash = utils_hash_string(func_name);
@@ -177,7 +174,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   {
     res = visit(parser, parser->functions->functions[func_idx][i], func_variables);
     
-    if(res[0] == 1)
+    if(res.isreturned == 1)
     {
       goto ret;
     }
@@ -186,9 +183,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   ret:
   free_variables(func_variables);
 
-  int ret = res[1];
-  free(res);
-  return ret;
+  return res.value;
 }
 
 // builtin print function
@@ -212,9 +207,9 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
   return 0;
 }
 
-int* visit_if(Parser* parser, AST* ast, Variables* local_variables)
+Return visit_if(Parser* parser, AST* ast, Variables* local_variables)
 {
-  int* res = calloc(2, sizeof(int)); 
+  Return res = new_return();
 
   if(visit_condition(parser, ast->left, local_variables))
   {
