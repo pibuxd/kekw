@@ -6,7 +6,7 @@
 // create new Local Variables
 Variables* new_variables()
 {
-  Variables* variables = malloc(1*sizeof(Variables));
+  Variables* variables = calloc(1, sizeof(Variables));
   
   variables->size = 50;
   variables->list = calloc(variables->size, sizeof(Node*));
@@ -16,26 +16,37 @@ Variables* new_variables()
 
 void free_node(Node* x)
 {
+  free(x->key);
+
   if(x->next != NULL)
   {
     free_node(x->next);
   }
 
-  free(x->next);
+  free(x);
 }
 
 void free_variables(Variables* variables)
 {
   for(int i = 0; i < variables->size; i++)
   {
-    Node* node = variables->list[i];
+    if(variables->list[i] == NULL)
+    {
+      free(variables->list[i]);
+      continue;
+    }    
 
-    if(node != NULL)
+    Node* node = variables->list[i];
+    if(node->next != NULL)
     {
       free_node(node->next);
     }
+
+    free(node->key);
     free(variables->list[i]);
   }
+
+  free(variables->list);
   free(variables);
 }
 
@@ -78,7 +89,7 @@ void variables_add(Variables* variables, char* var_name, int val)
     }
   }
 
-  node->next = malloc(1*sizeof(Node));
+  node->next = calloc(1, sizeof(Node));
   node->next->key = strdup(var_name);
   node->next->value = val;
   node->next->next = NULL;

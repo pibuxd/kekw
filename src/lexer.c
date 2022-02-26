@@ -6,7 +6,7 @@
 
 Lexer* new_lexer(char* content)
 {
-  Lexer* lexer = malloc(1*sizeof(Lexer));
+  Lexer* lexer = calloc(1, sizeof(Lexer));
 
   lexer->content = strdup(content);
   lexer->i = 0;
