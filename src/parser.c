@@ -64,6 +64,16 @@ Token* parser_previous_token(Parser* parser){
 // eats token or warn
 void parser_eat(Parser* parser, int value)
 {
+  if(value == TOKEN_SEMI)
+  {
+    if(parser_current_token(parser)->type == value)
+    {
+      parser_get_next_token(parser);
+    }
+
+    return;
+  }
+
   if(parser_current_token(parser)->type != value)
   {
     // print error with wrong parsed token
@@ -74,7 +84,6 @@ void parser_eat(Parser* parser, int value)
 
   // print parsed token (FOR DEBUG)
   // printf("PARSER - token: %s\n", parser_current_token(parser)->value);
-
   parser_get_next_token(parser);
 }
 
