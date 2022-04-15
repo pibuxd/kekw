@@ -1,10 +1,11 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
+#include "return.h"
 
 typedef struct NODE_STRUCT
 {
   char* key;
-  int value;
+  void* value;
   struct NODE_STRUCT* next;
 } Node;
 
@@ -22,9 +23,9 @@ void free_variables(Variables* variables);
 
 int variables_hash(char* str, int size);
 
-void variables_add(Variables* variables, char* name, int val);
+void variables_add(Variables* variables, char* name, void* val);
 
-int* variables_get(Variables* variables, char* var_name);
+Return* variables_get(Variables* variables, char* var_name);
 
 void variables_delete(Variables* variables, int name_hash);
 

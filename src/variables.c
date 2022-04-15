@@ -53,20 +53,20 @@ void free_variables(Variables* variables)
 // returns hash as int with modulo as size of hash table
 int variables_hash(char* str, int size)
 {
-  const int mod = size;
+  const int MOD = size, P = 9973;
   int res = 0, p = 1;
 
   for(unsigned int i = 0, strl = strlen(str); i < strl; i++)
   {
-    res = (res + ((str[i] - 'a' + 1) * p) % mod ) % mod;
-    p = (p * 31) % mod;
+    res = (res + ((str[i] - 'a' + 1) * p) % MOD ) % MOD;
+    p = (p * P) % MOD;
   }
 
   return res;
 }
 
 // insert new variable to hash table
-void variables_add(Variables* variables, char* var_name, int val)
+void variables_add(Variables* variables, char* var_name, void* val)
 {
   // variables->size += 1;
   // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
@@ -96,9 +96,9 @@ void variables_add(Variables* variables, char* var_name, int val)
 }
 
 // returns {does_exists, value} from hash table
-int* variables_get(Variables* variables, char* var_name)
+Return* variables_get(Variables* variables, char* var_name)
 { 
-  int* res = calloc(2, sizeof(int));
+  Return* res = new_return();
   int var_name_hash = variables_hash(var_name, variables->size);
   
   Node* node = variables->list[var_name_hash];
@@ -114,7 +114,7 @@ int* variables_get(Variables* variables, char* var_name)
 
     if(strcmp(node->key, var_name) == 0)
     {
-      res[0] = 1, res[1] = node->value;
+      res->isreturned = 1, res->value = node->value;
       return res;
     }
   }

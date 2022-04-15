@@ -3,9 +3,9 @@
 
 typedef struct RETURN_STRUCT {
   int isreturned;
-  int value;
+  void* value;
 } Return;
 
-Return new_return();
+Return* new_return();
 
 #endif // !RETURN_H

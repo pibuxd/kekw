@@ -1,7 +1,8 @@
 #include "include/return.h"
+#include <stdlib.h>
 
-Return new_return()
+Return* new_return()
 {
-  Return res = {0, 0};
+  Return* res = calloc(1, sizeof(Return));
   return res;
 }

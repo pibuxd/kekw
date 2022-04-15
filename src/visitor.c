@@ -7,23 +7,26 @@
 // main function
 void visit_compound(Parser* parser)
 {
-  Return res = new_return();
+  Return* res = new_return();
 
   for(int i = 1; i <= parser->ast_size; i++)
   {
     res = visit(parser, parser->ast[i], parser->global_variables);
     // if "return" captured
-    if(res.isreturned == 1)
+    if(res->isreturned == 1)
     {
+      free(res);
       return;
     }
   }
+
+  free(res);
 }
 
 // visit line
-Return visit(Parser* parser, AST* ast, Variables* local_variables)
+Return* visit(Parser* parser, AST* ast, Variables* local_variables)
 {
-  Return res = new_return();
+  Return* res = new_return();
 
   if(ast->token->type == TOKEN_EQUALS)
   {
@@ -35,8 +38,8 @@ Return visit(Parser* parser, AST* ast, Variables* local_variables)
   }
   else if(ast->token->type == TOKEN_RETURN)
   {
-    res.isreturned = 1;
-    res.value = visit_condition(parser, ast->right, local_variables);
+    res->isreturned = 1;
+    res->value = (void*)(intptr_t)visit_condition(parser, ast->right, local_variables);
   }
   else if(strcmp(ast->token->value, "if") == 0)
   {
@@ -108,7 +111,7 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 { 
   char* var_name = strdup(ast->left->token->value);
 
-  variables_add(local_variables, var_name, visit_condition(parser, ast->right, local_variables));
+  variables_add(local_variables, var_name, (void*)(intptr_t)visit_condition(parser, ast->right, local_variables));
   free(var_name);
 }
 
@@ -117,21 +120,21 @@ int visit_get_var(Parser* parser, char* name, Variables* local_variables)
 {
   char* var_name = strdup(name);
 
-  int* var = variables_get(local_variables, var_name);
-  if(var[0] == 1)
+  Return* var = variables_get(local_variables, var_name);
+  if(var->isreturned == 1)
   {
-    int v = var[1];
+    int result = (intptr_t)var->value;
     free(var);
     free(var_name);
-    return v;
+    return result;
   }
   else // global variable
   {
-    int* var = variables_get(parser->global_variables, var_name);
-    int v = var[1];
+    Return* var = variables_get(parser->global_variables, var_name);
+    int result = (intptr_t)var->value;
     free(var);
     free(var_name);
-    return v;
+    return result;
   }
 }
 
@@ -154,7 +157,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
     return visit_print_function(parser, ast->right, local_variables);
   }
 
-  Return res = new_return();
+  Return* res = new_return();
 
   char* func_name = strdup(ast->token->value);
   int func_name_hash = utils_hash_string(func_name);
@@ -166,7 +169,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   Variables* func_variables = new_variables();
   for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++)
   {
-    variables_add(func_variables, parser->functions->functions_args_order[func_idx][i], visit_condition(parser, v->left, local_variables));
+    variables_add(func_variables, parser->functions->functions_args_order[func_idx][i], (void*)(intptr_t)visit_condition(parser, v->left, local_variables));
     v = v->right;
   }
 
@@ -174,7 +177,7 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   {
     res = visit(parser, parser->functions->functions[func_idx][i], func_variables);
     
-    if(res.isreturned == 1)
+    if(res->isreturned == 1)
     {
       goto ret;
     }
@@ -182,8 +185,9 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 
   ret:
   free_variables(func_variables);
-
-  return res.value;
+  int result = (intptr_t)res->value;
+  free(res);
+  return result;
 }
 
 // builtin print function
@@ -207,9 +211,9 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
   return 0;
 }
 
-Return visit_if(Parser* parser, AST* ast, Variables* local_variables)
+Return* visit_if(Parser* parser, AST* ast, Variables* local_variables)
 {
-  Return res = new_return();
+  Return* res = new_return();
 
   if(visit_condition(parser, ast->left, local_variables))
   {

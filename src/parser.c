@@ -1,10 +1,10 @@
 #include "include/parser.h"
 #include "include/utils.h"
+#include "include/string.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
 
 // create new Parser
 Parser* new_parser(Lexer* lexer, Token* token)
@@ -269,6 +269,12 @@ AST* parser_assignment_statement(Parser* parser)
 
   ast->left = new_ast(NULL, NULL, var_tok);
   ast->token = tok;
+  // printf("tok: %d\n", parser_current_token(parser)->type);
+  // if(parser_current_token(parser)->type == TOKEN_STRING)
+  // {
+  //   puts("JDDD");
+  // }
+
   ast->right = parser_condition(parser);
 
   return ast;

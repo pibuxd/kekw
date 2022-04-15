@@ -5,7 +5,7 @@
 
 void visit_compound(Parser* parser);
 
-Return visit(Parser* parser, AST* ast, Variables* local_variables);
+Return* visit(Parser* parser, AST* ast, Variables* local_variables);
 
 int visit_condition(Parser* parser, AST* ast, Variables* local_variables);
 
@@ -21,6 +21,6 @@ int visit_call_function(Parser* parser, AST* ast, Variables* local_variables);
 
 int visit_print_function(Parser* parser, AST* ast, Variables* local_variables);
 
-Return visit_if(Parser* parser, AST* ast, Variables* local_variables);
+Return* visit_if(Parser* parser, AST* ast, Variables* local_variables);
 
 #endif // !VISITOR_H
