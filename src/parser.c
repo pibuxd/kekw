@@ -176,6 +176,11 @@ AST* parser_factor(Parser* parser)
     parser_eat(parser, TOKEN_INT);
     return new_ast(NULL, NULL, token);
   }
+  else if(token->type == TOKEN_STRING)
+  {
+    parser_eat(parser, TOKEN_STRING);
+    return new_ast(NULL, NULL, token);
+  }
   else if(token->type == TOKEN_ID)
   {
     parser_eat(parser, TOKEN_ID);
@@ -193,6 +198,11 @@ AST* parser_factor(Parser* parser)
     AST* res = parser_expr(parser);
     parser_eat(parser, TOKEN_RPAREN);
     return res;
+  }
+  else if(token->type == TOKEN_STRING)
+  {
+    parser_eat(parser, TOKEN_STRING);
+    return new_ast(NULL, NULL, token);
   }
 
   lexer_print_error(parser->lexer);
@@ -238,21 +248,13 @@ AST* parser_statement(Parser* parser)
 // change AST with return
 AST* parser_return(Parser* parser)
 {
-  AST* ast = new_ast(NULL, NULL, NULL);
-
   parser_eat(parser, TOKEN_ID);
-
-  ast->left = new_ast(NULL, NULL, NULL);
-  ast->token = new_token(TOKEN_RETURN, "return");
-  ast->right = parser_condition(parser);
-
-  return ast;
+  return new_ast(NULL, parser_condition(parser), new_token(TOKEN_RETURN, "return"));
 }
 
 // change AST with new variable or function assignment
 AST* parser_assignment_statement(Parser* parser)
 {
-  AST* ast = new_ast(NULL, NULL, NULL);
   parser_eat(parser, TOKEN_ID);
   
   Token* var_tok = parser_current_token(parser);
@@ -267,17 +269,7 @@ AST* parser_assignment_statement(Parser* parser)
     return parser_define_function(parser, var_tok->value);
   }
 
-  ast->left = new_ast(NULL, NULL, var_tok);
-  ast->token = tok;
-  // printf("tok: %d\n", parser_current_token(parser)->type);
-  // if(parser_current_token(parser)->type == TOKEN_STRING)
-  // {
-  //   puts("JDDD");
-  // }
-
-  ast->right = parser_condition(parser);
-
-  return ast;
+  return new_ast(new_ast(NULL, NULL, var_tok), parser_condition(parser), tok);
 }
 
 // put new function to parser->functions...
@@ -285,7 +277,6 @@ AST* parser_define_function(Parser* parser, char* f_name)
 {
   parser->functions->functions_size += 1;
   unsigned int func_idx = parser->functions->functions_size;
-
   char* func_name = strdup(f_name);
   int func_name_hash = utils_hash_string(func_name);
 
@@ -352,30 +343,16 @@ AST* parser_call_function(Parser* parser)
 AST* parser_get_args(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, NULL);
-  Token* token = parser_current_token(parser);
 
   if(parser_current_token(parser)->type != TOKEN_RPAREN)
   {
-    if(token->type == TOKEN_STRING)
-    {
-      parser_eat(parser, TOKEN_STRING);
-      ast->token = token;
-      if(parser_current_token(parser)->type == TOKEN_COMMA)
-      {
-      parser_eat(parser, TOKEN_COMMA);
-      ast->right = parser_get_args(parser);
-      }
-    }
-    else
-    {
-      ast->left = parser_condition(parser);
-      ast->token = new_token(TOKEN_EQUALS, "=");
+    ast->left = parser_condition(parser);
+    ast->token = new_token(TOKEN_EQUALS, "=");
 
-      if(parser_current_token(parser)->type == TOKEN_COMMA)
-      {
+    if(parser_current_token(parser)->type == TOKEN_COMMA)
+    {
       parser_eat(parser, TOKEN_COMMA);
       ast->right = parser_get_args(parser);
-      }
     }
   }
 
@@ -385,17 +362,14 @@ AST* parser_get_args(Parser* parser)
 // returns AST with parsed if
 AST* parser_if(Parser* parser)
 {
-  AST* ast = new_ast(NULL, NULL, NULL);
+  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_IF, "if"));
 
   parser_eat(parser, TOKEN_ID);
-
-  ast->token = new_token(TOKEN_IF, "if");
-
   ast->left = parser_condition(parser);
   parser_eat(parser, TOKEN_LBRACE);
   ast->right = parser_statement(parser);
   parser_eat(parser, TOKEN_SEMI);
   parser_eat(parser, TOKEN_RBRACE);
-
+  
   return ast;
 }

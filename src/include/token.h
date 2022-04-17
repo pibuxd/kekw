@@ -34,6 +34,10 @@ typedef struct TOKEN_STRUCT
   char* value;
 } Token;
 
+// char* typelut[] = {
+  // [TOKEN_ID] = "TOKEN_ID",
+// }
+
 Token* new_token(int type, char* value);
 
 void free_token(Token* token);

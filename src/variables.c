@@ -17,6 +17,9 @@ Variables* new_variables()
 void free_node(Node* x)
 {
   free(x->key);
+  // free(x->var->value);
+  // free(x->var->type);
+  free(x->var);
 
   if(x->next != NULL)
   {
@@ -66,7 +69,7 @@ int variables_hash(char* str, int size)
 }
 
 // insert new variable to hash table
-void variables_add(Variables* variables, char* var_name, void* val)
+void variables_add(Variables* variables, char* var_name, void* val, char* type)
 {
   // variables->size += 1;
   // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
@@ -84,21 +87,22 @@ void variables_add(Variables* variables, char* var_name, void* val)
     node = node->next;
     if(strcmp(node->key, var_name) == 0)
     {
-      node->value = val;
+      node->var->value = val;
+      node->var->type = strdup(type);
       return;
     }
   }
 
   node->next = calloc(1, sizeof(Node));
   node->next->key = strdup(var_name);
-  node->next->value = val;
+  node->next->var = new_var(val, type);
   node->next->next = NULL;
 }
 
-// returns {does_exists, value} from hash table
-Return* variables_get(Variables* variables, char* var_name)
+// returns {value, type} from hash table
+Var* variables_get(Variables* variables, char* var_name)
 { 
-  Return* res = new_return();
+  Var* res = new_var(0, "int");
   int var_name_hash = variables_hash(var_name, variables->size);
   
   Node* node = variables->list[var_name_hash];
@@ -114,7 +118,8 @@ Return* variables_get(Variables* variables, char* var_name)
 
     if(strcmp(node->key, var_name) == 0)
     {
-      res->isreturned = 1, res->value = node->value;
+      res->value = node->var->value;
+      res->type = node->var->type;
       return res;
     }
   }
