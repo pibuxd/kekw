@@ -55,11 +55,14 @@ Var* visit_condition(Parser* parser, AST* ast, Variables* local_variables)
     case TOKEN_STRING:
       return new_var(ast->token->value, "str");
     case TOKEN_ID:
+    {
       Var* _var = variables_get(local_variables, ast->token->value);
       if(strcmp(_var->type, "str") == 0)
       {
         return _var;
       }
+      free(_var);
+    }
   }
 
   return new_var((void*)(intptr_t)visit_condition_int(parser, ast, local_variables), "int");
