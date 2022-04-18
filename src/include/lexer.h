@@ -8,6 +8,7 @@ typedef struct LEXER_STRUCT
   char current_c; // current content[i] = current_c
   unsigned int i;
   unsigned int current_line;
+  int content_len;
 } Lexer;
 
 Lexer* new_lexer(char* content);
