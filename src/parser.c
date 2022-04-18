@@ -367,8 +367,17 @@ AST* parser_if(Parser* parser)
   parser_eat(parser, TOKEN_ID);
   ast->left = parser_condition(parser);
   parser_eat(parser, TOKEN_LBRACE);
-  ast->right = parser_statement(parser);
-  parser_eat(parser, TOKEN_SEMI);
+
+  AST* _ast = ast;
+
+  while(parser_current_token(parser)->type != TOKEN_RBRACE)
+  {
+    _ast->mid = new_ast(NULL, NULL, NULL);
+    _ast = _ast->mid;
+    _ast->right = parser_statement(parser);
+    parser_eat(parser, TOKEN_SEMI);
+  }
+  
   parser_eat(parser, TOKEN_RBRACE);
   
   return ast;

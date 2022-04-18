@@ -17,8 +17,6 @@ Variables* new_variables()
 void free_node(Node* x)
 {
   free(x->key);
-  // free(x->var->value);
-  // free(x->var->type);
   free(x->var);
 
   if(x->next != NULL)

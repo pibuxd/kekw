@@ -1,9 +1,9 @@
 var sum = (n){
   if n > 1 {
-    return n + sum(n-1);
-  };
+    return n + sum(n-1)
+  }
 
-  return n;
-};
+  return n
+}
 
-print("SUM = ", sum(6));
+print("SUM = ", sum(6))
