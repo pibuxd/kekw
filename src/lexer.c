@@ -12,6 +12,7 @@ Lexer* new_lexer(char* content)
   lexer->i = 0;
   lexer->current_c = content[lexer->i];
   lexer->current_line = 1;
+  lexer->content_len = strlen(lexer->content);
 
   return lexer;
 }
@@ -25,7 +26,7 @@ void free_lexer(Lexer* lexer)
 // just advance Lexer
 void lexer_advance(Lexer* lexer)
 {
-  if(lexer->current_c != '\0' && lexer->i < strlen(lexer->content)){
+  if(lexer->current_c != '\0' && lexer->i < lexer->content_len){
     lexer->i += 1;
     lexer->current_c = lexer->content[lexer->i];
   }
@@ -33,7 +34,11 @@ void lexer_advance(Lexer* lexer)
 
 // peek char without advancing Lexer
 char lexer_peek(Lexer* lexer)
-{
+{ 
+  if(lexer->i == lexer->content_len)
+  {
+    return ' ';
+  }
   return lexer->content[lexer->i+1];
 }
 
@@ -53,7 +58,7 @@ void lexer_skip_whitespace(Lexer* lexer)
 // returns next Token and advance Lexer
 Token* lexer_get_next_token(Lexer* lexer)
 {
-  while(lexer->current_c != '\0' && lexer->i < strlen(lexer->content))
+  while(lexer->current_c != '\0' && lexer->i < lexer->content_len)
   {
     if(lexer->current_c == ' ' || lexer->current_c == 10)
       lexer_skip_whitespace(lexer);
