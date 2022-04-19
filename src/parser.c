@@ -82,7 +82,7 @@ void parser_eat(Parser* parser, int value)
   }
 
   // print parsed token (FOR DEBUG)
-  // printf("PARSER - token: %s\n", parser_current_token(parser)->value);
+  printf("PARSER - token: %s\n", parser_current_token(parser)->value);
   parser_get_next_token(parser);
 }
 
@@ -169,10 +169,15 @@ AST* parser_term(Parser* parser)
 AST* parser_factor(Parser* parser)
 {
   Token* token = parser_current_token(parser);
-
+  
   if(token->type == TOKEN_INT)
   {
     parser_eat(parser, TOKEN_INT);
+    return new_ast(NULL, NULL, token);
+  }
+  else if(token->type == TOKEN_CHAR)
+  {
+    parser_eat(parser, TOKEN_CHAR);
     return new_ast(NULL, NULL, token);
   }
   else if(token->type == TOKEN_STRING)
@@ -197,11 +202,6 @@ AST* parser_factor(Parser* parser)
     AST* res = parser_expr(parser);
     parser_eat(parser, TOKEN_RPAREN);
     return res;
-  }
-  else if(token->type == TOKEN_STRING)
-  {
-    parser_eat(parser, TOKEN_STRING);
-    return new_ast(NULL, NULL, token);
   }
 
   lexer_print_error(parser->lexer);

@@ -17,18 +17,19 @@ typedef struct TOKEN_STRUCT
     TOKEN_GREATEREQ, // 9
     TOKEN_LESSEQ, // 10
     TOKEN_STRING, // 11
-    TOKEN_INT, // 12
-    TOKEN_SEMI, // 13
-    TOKEN_LPAREN, // 14
-    TOKEN_RPAREN, // 15
-    TOKEN_LBRACE, // 16
-    TOKEN_RBRACE, // 17
-    TOKEN_COMMA, // 18
-    TOKEN_FUNC, // 19
-    TOKEN_CALL, // 20
-    TOKEN_IF, // 21
-    TOKEN_RETURN, // 22
-    TOKEN_EOF // 23
+    TOKEN_CHAR, // 12
+    TOKEN_INT, // 13
+    TOKEN_SEMI, // 14
+    TOKEN_LPAREN, // 15
+    TOKEN_RPAREN, // 16
+    TOKEN_LBRACE, // 17
+    TOKEN_RBRACE, // 18
+    TOKEN_COMMA, // 19
+    TOKEN_FUNC, // 20
+    TOKEN_CALL, // 21
+    TOKEN_IF, // 22
+    TOKEN_RETURN, // 23
+    TOKEN_EOF // 24
   } type;
 
   char* value;

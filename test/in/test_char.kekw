@@ -1,0 +1,8 @@
+var j = 'j';
+var d = 'd';
+
+var foo = (s){
+  return s;
+}
+
+print(foo(j))

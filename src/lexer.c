@@ -84,6 +84,13 @@ Token* lexer_get_next_token(Lexer* lexer)
       free(str);
       return tok;
     }
+    else if(lexer->current_c == '\'')
+    {
+      char* str = lexer_collect_char(lexer);
+      Token* tok = new_token(TOKEN_CHAR, str);
+      free(str);
+      return tok;
+    }
     
     char peek = lexer_peek(lexer);
 
@@ -144,6 +151,24 @@ char* lexer_collect_string(Lexer* lexer)
 
     lexer_advance(lexer);
   }
+  lexer_advance(lexer);
+
+  return str;
+}
+
+char* lexer_collect_char(Lexer* lexer)
+{
+  lexer_advance(lexer);
+
+  char* str = malloc(1*sizeof(char));
+  str[0] = '\0';
+
+  char* c = lexer_get_current_char_as_string(lexer);
+  str = realloc(str, (strlen(str)+strlen(c)+1) * sizeof(char));
+  strcat(str, c);
+  free(c);
+
+  lexer_advance(lexer);
   lexer_advance(lexer);
 
   return str;

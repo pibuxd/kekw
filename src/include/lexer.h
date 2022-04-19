@@ -29,6 +29,8 @@ int lexer_get_line(Lexer* lexer);
 
 char* lexer_collect_string(Lexer* lexer);
 
+char* lexer_collect_char(Lexer* lexer);
+
 char* lexer_collect_id(Lexer* lexer);
 
 char* lexer_collect_int(Lexer* lexer);
