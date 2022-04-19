@@ -1,8 +1,9 @@
-var j = 'j';
+var j = 106;
 var d = 'd';
 
 var foo = (s){
   return s;
 }
 
-print(foo(j))
+print(char(foo(j)), d, ' ', '7');
+print(int('j'))

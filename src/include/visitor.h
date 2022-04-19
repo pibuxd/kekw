@@ -10,9 +10,9 @@ Return* visit(Parser* parser, AST* ast, Variables* local_variables);
 
 Var* visit_condition(Parser* parser, AST* ast, Variables* local_variables);
 
-int visit_condition_int(Parser* parser, AST* ast, Variables* local_variables);
+Var* visit_condition(Parser* parser, AST* ast, Variables* local_variables);
 
-int visit_expr_int(Parser* parser, AST* ast, int val, Variables* local_variables);
+Var* visit_expr(Parser* parser, AST* ast, int val, Variables* local_variables);
 
 void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables);
 
@@ -23,6 +23,10 @@ void visit_define_function(Parser* parser, AST* ast);
 Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables);
 
 int visit_print_function(Parser* parser, AST* ast, Variables* local_variables);
+
+Var* visit_int_function(Parser* parser, AST* ast, Variables* local_variables);
+
+Var* visit_char_function(Parser* parser, AST* ast, Variables* local_variables);
 
 Return* visit_if(Parser* parser, AST* ast, Variables* local_variables);
 
