@@ -15,8 +15,3 @@ int utils_hash_string(char* str)
 
   return res;
 }
-
-int utils_stoi(char* str)
-{
-  return atoi(str);
-}
