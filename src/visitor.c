@@ -52,8 +52,8 @@ Var* visit_condition(Parser* parser, AST* ast, Variables* local_variables)
 {
   switch (ast->token->type)
   {
-    // case TOKEN_STRING:
-      // return new_var(new_str(ast->token->value), "str");
+    case TOKEN_STRING:
+      return new_var(new_str(ast->token->value), "str");
     case TOKEN_CHAR:
       return new_var((void*)(intptr_t)visit_condition_int(parser, ast, local_variables), "char");
     case TOKEN_INT:
@@ -152,6 +152,11 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
     // printf("add INT: %s\n", var_name);
     variables_add(local_variables, var_name, cond->value, "int");
   }
+  else if(strcmp(cond->type, "str") == 0)
+  {
+    // printf("add STR: %s\n", var_name);
+    variables_add(local_variables, var_name, cond->value, "str");
+  }
   
   free(var_name);
 }
@@ -187,10 +192,6 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   if(strcmp(ast->token->value, "print") == 0)
   {
     return new_var((void*)(intptr_t)visit_print_function(parser, ast->right, local_variables), "int");
-  }
-  else if(strcmp(ast->token->value, "char") == 0)
-  {
-    return visit_char_function(parser, ast->right, local_variables);
   }
 
   Return* res = new_return(0, new_var(0, "int"));
@@ -231,9 +232,9 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   Var* cond = visit_condition(parser, ast->left, local_variables);
 
-  if(strcmp(cond->type, "char") == 0)
+  if(strcmp(cond->type, "str") == 0)
   {
-    printf("%c", cond->value);
+    printf("%s", ((Str*)cond->value)->value);
   }
   else if(ast->token->type == TOKEN_EQUALS)
   {
@@ -248,15 +249,6 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 
   printf("\n");
   return 0;
-}
-
-Var* visit_char_function(Parser* parser, AST* ast, Variables* local_variables)
-{
-  puts("visit_char_function");
-  Var* cond = visit_condition(parser, ast->left, local_variables);
-  cond->type = "char";
-  printf("%s", cond->type);
-  return cond;
 }
 
 Return* visit_if(Parser* parser, AST* ast, Variables* local_variables)

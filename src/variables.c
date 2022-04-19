@@ -71,7 +71,7 @@ void variables_add(Variables* variables, char* var_name, void* val, char* type)
 {
   // variables->size += 1;
   // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
-  printf("%s = %d, (%s)\n", var_name, val, type);
+  // printf("%s = %d, (%s)\n", var_name, val, type);
   int var_name_hash = variables_hash(var_name, variables->size);
 
   if(variables->list[var_name_hash] == NULL)

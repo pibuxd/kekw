@@ -4,7 +4,7 @@
 #include "lexer.h"
 #include "variables.h"
 #include "functions.h"
-
+#include "string.h"
 typedef struct PARSER_STRUCT
 {
   Lexer* lexer;

@@ -82,7 +82,7 @@ void parser_eat(Parser* parser, int value)
   }
 
   // print parsed token (FOR DEBUG)
-  printf("PARSER - token: %s\n", parser_current_token(parser)->value);
+  // printf("PARSER - token: %s\n", parser_current_token(parser)->value);
   parser_get_next_token(parser);
 }
 
@@ -169,7 +169,7 @@ AST* parser_term(Parser* parser)
 AST* parser_factor(Parser* parser)
 {
   Token* token = parser_current_token(parser);
-  
+
   if(token->type == TOKEN_INT)
   {
     parser_eat(parser, TOKEN_INT);
