@@ -53,7 +53,7 @@ Var* visit_condition(Parser* parser, AST* ast, Variables* local_variables)
   switch (ast->token->type)
   {
     case TOKEN_STRING:
-      return new_var(ast->token->value, "str");
+      return new_var(new_str(ast->token->value), "str");
     case TOKEN_ID:
     {
       Var* _var = variables_get(local_variables, ast->token->value);
@@ -216,13 +216,14 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 
   if(strcmp(cond->type, "str") == 0)
   {
-    printf("%s", (char*)(intptr_t)cond->value);
+    printf("%s", ((Str*)cond->value)->value);
   }
   else if(ast->token->type == TOKEN_EQUALS)
   {
     printf("%d", (intptr_t)cond->value);
   }
 
+  free(cond);
   if(ast->right != NULL)
   {
     return visit_print_function(parser, ast->right, local_variables);

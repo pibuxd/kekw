@@ -2,7 +2,7 @@
 #define VARIABLES_H
 #include "return.h"
 #include "var.h"
-
+#include "str.h"
 typedef struct NODE_STRUCT
 {
   char* key;
