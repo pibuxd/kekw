@@ -1,8 +1,0 @@
-var o = "jd"
-var x = 5;
-
-if x == 5 {
-  print("j")
-  print("xd")
-  print(x, o);
-}

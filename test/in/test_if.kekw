@@ -1,12 +1,13 @@
-var s = 10;
+var foo = (xd){
+  if xd == 5 {
+    print(xd)
+    return 5
+  }
+  if xd > 6 {
+    print(xd-6)
+    var xd = xd + 100
+    return xd
+  }
+}
 
-var x = (){
-  if 5 > 4 {
-    var s = s + 5;
-  };
-
-  print("after if");
-};
-
-x();
-print(s);
+print(foo(5), foo(14), foo(1));

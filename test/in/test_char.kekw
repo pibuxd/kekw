@@ -1,9 +1,9 @@
-var j = 106;
-var d = 'd';
+var j = 'j'
+var d = 'd'
+var jd = j+d
 
-var foo = (s){
-  return s;
+var foo = (g){
+  return char(g)
 }
 
-print(char(foo(j)), d, ' ', '7');
-print(int('j'))
+print(j, 'x', d, ' ', jd, foo('F'));

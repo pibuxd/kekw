@@ -16,9 +16,9 @@ for file in test/in/*; do
   filename=${file##*/}
   filename=${filename%.*}
 
-  ./kekw.out $file > tocheck.txt
+  ./kekw.out $file > tocheck.out
 
-  if diff -b tocheck.txt test/txt/${filename}.txt > /dev/null; then
+  if diff -b tocheck.out test/out/${filename}.out > /dev/null; then
     printf "test: ${blue}${filename} ${green}OK${reset}\n"
   else
     printf "test: ${blue}${filename} ${red}ERROR${reset}\n"
@@ -27,4 +27,4 @@ done
 
 printf "\n"
 make clean
-rm tocheck.txt
+rm tocheck.out
