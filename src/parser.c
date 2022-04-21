@@ -73,7 +73,7 @@ void parser_eat(Parser* parser, int value)
   {
     // print error with wrong parsed token
     lexer_print_error(parser->lexer);
-    printf("PARSER - expected token: %d, got: %d\n", value, parser_current_token(parser)->type);
+    printf("PARSER - expected token: %s, got: %s\n", token_map[value], token_map[parser_current_token(parser)->type]);
     exit(-1);
   }
 

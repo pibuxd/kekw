@@ -35,9 +35,33 @@ typedef struct TOKEN_STRUCT
   char* value;
 } Token;
 
-// char* typelut[] = {
-  // [TOKEN_ID] = "TOKEN_ID",
-// }
+static const char* const token_map[] = {
+  [TOKEN_ID] = "TOKEN_ID",
+  [TOKEN_PLUS] = "TOKEN_PLUS",
+  [TOKEN_MINUS] = "TOKEN_MINUS",
+  [TOKEN_MUL] = "TOKEN_MUL",
+  [TOKEN_DIV] = "TOKEN_DIV",
+  [TOKEN_EQUALS] = "TOKEN_EQUALS",
+  [TOKEN_GREATER] = "TOKEN_GREATER",
+  [TOKEN_LESS] = "TOKEN_LESS",
+  [TOKEN_EQ] = "TOKEN_EQ",
+  [TOKEN_GREATEREQ] = "TOKEN_GREATEREQ",
+  [TOKEN_LESSEQ] = "TOKEN_LESSEQ",
+  [TOKEN_STRING] = "TOKEN_STRING",
+  [TOKEN_CHAR] = "TOKEN_CHAR",
+  [TOKEN_INT] = "TOKEN_INT",
+  [TOKEN_SEMI] = "TOKEN_SEMI",
+  [TOKEN_LPAREN] = "TOKEN_LPAREN",
+  [TOKEN_RPAREN] = "TOKEN_RPAREN",
+  [TOKEN_LBRACE] = "TOKEN_LBRACE",
+  [TOKEN_RBRACE] = "TOKEN_RBRACE",
+  [TOKEN_COMMA] = "TOKEN_COMMA",
+  [TOKEN_FUNC] = "TOKEN_FUNC",
+  [TOKEN_CALL] = "TOKEN_CALL",
+  [TOKEN_IF] = "TOKEN_IF",
+  [TOKEN_RETURN] = "TOKEN_RETURN",
+  [TOKEN_EOF] = "TOKEN_EOF",
+};
 
 Token* new_token(int type, char* value);
 
