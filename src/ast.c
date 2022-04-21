@@ -7,6 +7,7 @@ AST* new_ast(AST* left, AST* right, Token* token){
   ast->right = right;
   ast->token = token;
   ast->mid = NULL;
+  ast->mid2 = NULL;
   
   return ast;
 }

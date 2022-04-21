@@ -10,13 +10,13 @@
 Parser* new_parser(Lexer* lexer, Token* token)
 {
   // ! indexing starts at 1 (not 0)
-  Parser* parser = malloc(1*sizeof(Parser));
+  Parser* parser = calloc(1, sizeof(Parser));
 
   parser->lexer = lexer;
   parser->current_t = token;
   parser->previous_t = NULL;
 
-  parser->ast = malloc(1*sizeof(AST*));
+  parser->ast = calloc(1, sizeof(AST*));
   parser->ast_size = 0;
   parser->global_variables = new_variables();
   
@@ -270,10 +270,9 @@ AST* parser_assignment_statement(Parser* parser)
 // put new function to AST
 AST* parser_define_function(Parser* parser, char* func_name)
 {
-  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
-
   parser_eat(parser, TOKEN_LPAREN);
-
+  
+  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
   AST* mid2v = ast;
   while(parser_current_token(parser)->type == TOKEN_ID)
   {
