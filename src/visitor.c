@@ -24,25 +24,20 @@ void visit_compound(Parser* parser)
 // visit new
 Return* visit(Parser* parser, AST* ast, Variables* local_variables)
 {
-  if(ast->token->type == TOKEN_EQUALS)
+  switch (ast->token->type)
   {
-    visit_assign_var(parser, ast, local_variables);
-  }
-  else if(ast->token->type == TOKEN_FUNC)
-  {
-    visit_define_function(parser, ast, local_variables);
-  }
-  else if(ast->token->type == TOKEN_RETURN)
-  {
-    return new_return(1, visit_condition(parser, ast->right, local_variables));
-  }
-  else if(strcmp(ast->token->value, "if") == 0)
-  {
-    return visit_if(parser, ast, local_variables);
-  }
-  else if(ast->token->type == TOKEN_CALL)
-  {
-    return new_return(0, visit_call_function(parser, ast, local_variables));
+    case TOKEN_EQUALS:
+      visit_assign_var(parser, ast, local_variables);
+      break;
+    case TOKEN_FUNC:
+      visit_define_function(parser, ast, local_variables);
+      break;
+    case TOKEN_RETURN:
+      return new_return(1, visit_condition(parser, ast->right, local_variables));
+    case TOKEN_IF:
+      return visit_if(parser, ast, local_variables);
+    case TOKEN_CALL:
+      return new_return(0, visit_call_function(parser, ast, local_variables));
   }
 
   return new_return(0, new_var(0, VAR_INT));
@@ -212,7 +207,7 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   ret:
   free_variables(variables);
   Var* result = res->var;
-  free(res);
+
   free(func_name);
   return result;
 }
