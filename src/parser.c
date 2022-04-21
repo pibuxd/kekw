@@ -1,5 +1,6 @@
 #include "include/parser.h"
 #include "include/utils.h"
+#include "include/function.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,14 +16,10 @@ Parser* new_parser(Lexer* lexer, Token* token)
   parser->current_t = token;
   parser->previous_t = NULL;
 
-  // MAIN
   parser->ast = malloc(1*sizeof(AST*));
   parser->ast_size = 0;
   parser->global_variables = new_variables();
   
-  // FUNCTIONS
-  parser->functions = new_functions();
-
   return parser;
 }
 
@@ -32,7 +29,6 @@ void free_parser(Parser* parser)
   free_token(parser->current_t);
   free_token(parser->previous_t);
   free_variables(parser->global_variables);
-  free_functions(parser->functions);
 
   for(int i = 1; i <= parser->ast_size; i++)
   {
@@ -271,28 +267,20 @@ AST* parser_assignment_statement(Parser* parser)
   return new_ast(new_ast(NULL, NULL, var_tok), parser_condition(parser), tok);
 }
 
-// put new function to parser->functions...
-AST* parser_define_function(Parser* parser, char* f_name)
+// put new function to AST
+AST* parser_define_function(Parser* parser, char* func_name)
 {
-  parser->functions->functions_size += 1;
-  unsigned int func_idx = parser->functions->functions_size;
-  char* func_name = strdup(f_name);
-  int func_name_hash = utils_hash_string(func_name);
-
   AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
-
-  functions_add_new(parser->functions, func_idx, func_name_hash);
 
   parser_eat(parser, TOKEN_LPAREN);
 
+  AST* mid2v = ast;
   while(parser_current_token(parser)->type == TOKEN_ID)
   {
-    parser->functions->functions_args_order_size[func_idx] += 1; 
-
     char* arg_name = strdup(parser_current_token(parser)->value);
-
-    parser->functions->functions_args_order[func_idx] = realloc(parser->functions->functions_args_order[func_idx], (parser->functions->functions_args_order_size[func_idx]+1)*sizeof(char*));
-    parser->functions->functions_args_order[func_idx][parser->functions->functions_args_order_size[func_idx]] = strdup(arg_name);
+    mid2v->mid2 = new_ast(NULL, NULL, NULL);
+    mid2v = mid2v->mid2;
+    mid2v->token = new_token(TOKEN_ID, arg_name);
 
     parser_eat(parser, TOKEN_ID);
     
@@ -305,18 +293,18 @@ AST* parser_define_function(Parser* parser, char* f_name)
   parser_eat(parser, TOKEN_RPAREN);
   parser_eat(parser, TOKEN_LBRACE);
 
+  AST* midv = ast;
   while(parser_current_token(parser)->type != TOKEN_RBRACE)
   {
-    parser->functions->func_size[func_idx] += 1;
-    
-    parser->functions->functions[func_idx] = realloc(parser->functions->functions[func_idx], (parser->functions->func_size[func_idx]+1)*sizeof(AST*));
-    parser->functions->functions[func_idx][parser->functions->func_size[func_idx]] = parser_statement(parser);
+    midv->mid = new_ast(NULL, NULL, NULL);
+    midv = midv->mid;
+    midv->right = parser_statement(parser);
+
     parser_eat(parser, TOKEN_SEMI);
   }
-
+  
   parser_eat(parser, TOKEN_RBRACE);
 
-  free(func_name);
   return ast;
 }
 

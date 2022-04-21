@@ -8,4 +8,6 @@ typedef struct VAR_STRUCT {
 
 Var* new_var(void* val, char* type);
 
+void free_var(Var* var);
+
 #endif // !VAR_H

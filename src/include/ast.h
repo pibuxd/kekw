@@ -6,6 +6,7 @@ typedef struct AST_STRUCT {
   struct AST_STRUCT* left;
   struct AST_STRUCT* right;
   struct AST_STRUCT* mid;
+  struct AST_STRUCT* mid2;
   Token* token;
 } AST;
 

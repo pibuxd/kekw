@@ -3,8 +3,6 @@
 #include "ast.h"
 #include "lexer.h"
 #include "variables.h"
-#include "functions.h"
-#include "string.h"
 typedef struct PARSER_STRUCT
 {
   Lexer* lexer;
@@ -15,9 +13,6 @@ typedef struct PARSER_STRUCT
   AST** ast;
   unsigned int ast_size;
   Variables* global_variables;
-
-  // FUNCTIONS
-  Functions* functions;
 } Parser;
 
 Parser* new_parser(Lexer* lexer, Token* token);

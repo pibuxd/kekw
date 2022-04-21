@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "include/function.h"
 
 // main function (starts)
 void visit_compound(Parser* parser)
@@ -29,7 +30,7 @@ Return* visit(Parser* parser, AST* ast, Variables* local_variables)
   }
   else if(ast->token->type == TOKEN_FUNC)
   {
-    visit_define_function(parser, ast);
+    visit_define_function(parser, ast, local_variables);
   }
   else if(ast->token->type == TOKEN_RETURN)
   {
@@ -153,14 +154,13 @@ Var* visit_get_var(Parser* parser, char* name, Variables* local_variables)
 }
 
 // define new function
-void visit_define_function(Parser* parser, AST* ast)
+void visit_define_function(Parser* parser, AST* ast, Variables* local_variables)
 {
-  // char* func_name = calloc(strlen(ast->token->value)+1, sizeof(char));
-  // strcpy(func_name, ast->token->value);
-  
-  // int func_name_hash = utils_hash_string(func_name);
-  // int func_idx = parser->functions_it[func_name_hash];
-  return;
+  char* func_name = strdup(ast->token->value);
+  Function* funcv = new_function();
+
+  funcv->contents = ast;
+  variables_add(local_variables, func_name, funcv, "func");
 }
 
 // call function
@@ -170,35 +170,39 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   {
     return new_var((void*)(intptr_t)visit_print_function(parser, ast->right, local_variables), "int");
   }
-  if(strcmp(ast->token->value, "char") == 0)
+  else if(strcmp(ast->token->value, "char") == 0)
   {
     return visit_char_function(parser, ast->right, local_variables);
   }
-  if(strcmp(ast->token->value, "int") == 0)
+  else if(strcmp(ast->token->value, "int") == 0)
   {
     return visit_int_function(parser, ast->right, local_variables);
   }
 
   Return* res = new_return(0, new_var(0, "int"));
+  Variables* variables = new_variables();
 
   char* func_name = strdup(ast->token->value);
-  int func_name_hash = utils_hash_string(func_name);
-  int func_idx = parser->functions->functions_it[func_name_hash];
-  free(func_name);
+  Var* funcv = visit_get_var(parser, func_name, local_variables);
+  // ((Function*)funcv->value)->variables = new_variables();
 
   // assign local variables passed in arguments
-  AST *v = ast->right;
-  Variables* func_variables = new_variables();
-  for(int i = 1; i <= parser->functions->functions_args_order_size[func_idx]; i++)
+  AST* v = ast->right;
+  AST* mid2v = ((Function*)funcv->value)->contents;
+  while(mid2v->mid2 != NULL)
   {
+    mid2v = mid2v->mid2;
     Var* var = visit_condition(parser, v->left, local_variables);
-    variables_add(func_variables, parser->functions->functions_args_order[func_idx][i], var->value, var->type);
+    variables_add(variables, mid2v->token->value, var->value, var->type);
     v = v->right;
   }
 
-  for(int i = 1; i <= parser->functions->func_size[func_idx]; i++)
-  {
-    res = visit(parser, parser->functions->functions[func_idx][i], func_variables);
+  AST* midv = ((Function*)funcv->value)->contents;
+  while(midv->mid != NULL)
+  { 
+    midv = midv->mid;
+
+    res = visit(parser, midv->right, variables);
     if(res->isreturned == 1)
     {
       goto ret;
@@ -206,9 +210,10 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   }
 
   ret:
-  free_variables(func_variables);
+  free_variables(variables);
   Var* result = res->var;
   free(res);
+  free(func_name);
   return result;
 }
 
