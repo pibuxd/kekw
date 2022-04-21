@@ -8,3 +8,9 @@ Return* new_return(int isreturned, Var* var)
   res->var = var;
   return res;
 }
+
+void free_return(Return* ret)
+{
+  free_var(ret->var);
+  free(ret);
+}

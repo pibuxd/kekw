@@ -9,4 +9,6 @@ typedef struct RETURN_STRUCT {
 
 Return* new_return(int isreturned, Var* var);
 
+void free_return(Return* ret);
+
 #endif // !RETURN_H
