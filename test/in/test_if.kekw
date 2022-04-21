@@ -6,7 +6,7 @@ var foo = (xd){
   if xd > 6 {
     print(xd-6)
     var xd = xd + 100
-    return xd
+    return xd;
   }
 }
 

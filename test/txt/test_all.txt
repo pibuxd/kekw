@@ -1,0 +1,5 @@
+STRING c int: 99,97 char: a
+if ok
+455
+xd
+d
