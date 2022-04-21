@@ -45,7 +45,7 @@ Return* visit(Parser* parser, AST* ast, Variables* local_variables)
     return new_return(0, visit_call_function(parser, ast, local_variables));
   }
 
-  return new_return(0, new_var(0, "int"));
+  return new_return(0, new_var(0, VAR_INT));
 }
 
 // returns Var from given condition in AST
@@ -103,18 +103,18 @@ Var* visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variabl
     curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, local_variables)->value / (intptr_t)visit_expr(parser, ast->right, curr_val, local_variables)->value;
     break;
   case TOKEN_INT:
-    return new_var((void*)(intptr_t)atoi(ast->token->value), "int");
+    return new_var((void*)(intptr_t)atoi(ast->token->value), VAR_INT);
   case TOKEN_CHAR:
-    return new_var((void*)(intptr_t)ast->token->value[0], "char");
+    return new_var((void*)(intptr_t)ast->token->value[0], VAR_CHAR);
   case TOKEN_STRING:
-    return new_var(new_str(ast->token->value), "str");
+    return new_var(new_str(ast->token->value), VAR_STR);
   case TOKEN_ID:
     return visit_get_var(parser, ast->token->value, local_variables);
   case TOKEN_CALL:
     return visit_call_function(parser, ast, local_variables);
   }
 
-  return new_var((void*)(intptr_t)curr_val, "int");
+  return new_var((void*)(intptr_t)curr_val, VAR_INT);
 }
 
 // assigns Var
@@ -123,17 +123,17 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
   char* var_name = strdup(ast->left->token->value);
   Var* cond = visit_condition(parser, ast->right, local_variables);
 
-  if(strcmp(cond->type, "char") == 0)
+  switch (cond->type)
   {
-    variables_add(local_variables, var_name, cond->value, "char");
-  }
-  else if(strcmp(cond->type, "int") == 0)
-  {
-    variables_add(local_variables, var_name, cond->value, "int");
-  }
-  else if(strcmp(cond->type, "str") == 0)
-  {
-    variables_add(local_variables, var_name, cond->value, "str");
+    case VAR_CHAR:
+      variables_add(local_variables, var_name, cond->value, VAR_CHAR);
+      break;
+    case VAR_INT:
+      variables_add(local_variables, var_name, cond->value, VAR_INT);
+      break;
+    case VAR_STR:
+      variables_add(local_variables, var_name, cond->value, VAR_STR);
+      break;
   }
   
   free(var_name);
@@ -160,7 +160,7 @@ void visit_define_function(Parser* parser, AST* ast, Variables* local_variables)
   Function* funcv = new_function();
 
   funcv->contents = ast;
-  variables_add(local_variables, func_name, funcv, "func");
+  variables_add(local_variables, func_name, funcv, VAR_FUNC);
 }
 
 // call function
@@ -168,7 +168,7 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   if(strcmp(ast->token->value, "print") == 0)
   {
-    return new_var((void*)(intptr_t)visit_print_function(parser, ast->right, local_variables), "int");
+    return new_var((void*)(intptr_t)visit_print_function(parser, ast->right, local_variables), VAR_INT);
   }
   else if(strcmp(ast->token->value, "char") == 0)
   {
@@ -179,7 +179,7 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
     return visit_int_function(parser, ast->right, local_variables);
   }
 
-  Return* res = new_return(0, new_var(0, "int"));
+  Return* res = new_return(0, new_var(0, VAR_INT));
   Variables* variables = new_variables();
 
   char* func_name = strdup(ast->token->value);
@@ -221,12 +221,12 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   Var* cond = visit_condition(parser, ast->left, local_variables);
-
-  if(strcmp(cond->type, "str") == 0)
+  
+  if(cond->type == VAR_STR)
   {
     printf("%s", ((Str*)cond->value)->value);
   }
-  else if(strcmp(cond->type, "char") == 0)
+  else if(cond->type == VAR_CHAR)
   {
     printf("%c", cond->value);
   }
@@ -250,7 +250,7 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 Var* visit_int_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   Var* cond = visit_condition(parser, ast->left, local_variables);
-  cond->type = "int";
+  cond->type = VAR_INT;
   return cond;
 }
 
@@ -258,7 +258,7 @@ Var* visit_int_function(Parser* parser, AST* ast, Variables* local_variables)
 Var* visit_char_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   Var* cond = visit_condition(parser, ast->left, local_variables);
-  cond->type = "char";
+  cond->type = VAR_CHAR;
   return cond;
 }
 
@@ -267,7 +267,7 @@ Return* visit_if(Parser* parser, AST* ast, Variables* local_variables)
 {
   if((intptr_t)visit_condition(parser, ast->left, local_variables)->value == 0)
   {
-    return new_return(0, new_var(0, "int"));
+    return new_return(0, new_var(0, VAR_INT));
   }
 
   AST* _ast = ast;
@@ -282,5 +282,5 @@ Return* visit_if(Parser* parser, AST* ast, Variables* local_variables)
     free(_ret);
   }
   
-  return new_return(0, new_var(0, "int"));
+  return new_return(0, new_var(0, VAR_INT));
 }

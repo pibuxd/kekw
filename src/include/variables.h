@@ -25,11 +25,9 @@ void free_variables(Variables* variables);
 
 int variables_hash(char* str, int size);
 
-void variables_add(Variables* variables, char* name, void* val, char* type);
+void variables_add(Variables* variables, char* name, void* val, int type);
 
 Var* variables_get(Variables* variables, char* var_name);
-
-void variables_delete(Variables* variables, int name_hash);
 
 void variables_delete_all(Variables* variables);
 

@@ -67,11 +67,11 @@ int variables_hash(char* str, int size)
 }
 
 // insert new variable to hash table
-void variables_add(Variables* variables, char* var_name, void* val, char* type)
+void variables_add(Variables* variables, char* var_name, void* val, int type)
 {
   // variables->size += 1;
   // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
-  // printf("%s = %d, (%s)\n", var_name, val, type);
+  // printf("%s = %p, (%s)\n", var_name, val, var_map[type]);
   int var_name_hash = variables_hash(var_name, variables->size);
 
   if(variables->list[var_name_hash] == NULL)
@@ -87,7 +87,7 @@ void variables_add(Variables* variables, char* var_name, void* val, char* type)
     if(strcmp(node->key, var_name) == 0)
     {
       node->var->value = val;
-      node->var->type = strdup(type);
+      node->var->type = type;
       return;
     }
   }
@@ -101,7 +101,7 @@ void variables_add(Variables* variables, char* var_name, void* val, char* type)
 // returns {value, type} from hash table
 Var* variables_get(Variables* variables, char* var_name)
 { 
-  Var* res = new_var(0, "int");
+  Var* res = new_var(0, VAR_INT);
   int var_name_hash = variables_hash(var_name, variables->size);
   
   Node* node = variables->list[var_name_hash];
@@ -124,12 +124,6 @@ Var* variables_get(Variables* variables, char* var_name)
   }
 
   return res;
-}
-
-void variables_delete(Variables* variables, int name_hash)
-{
-  // variables->values[name_hash] = 0;
-  // variables->exists[name_hash] = 0;
 }
 
 void variables_delete_all(Variables* variables)

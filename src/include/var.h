@@ -3,10 +3,23 @@
 
 typedef struct VAR_STRUCT {
   void* value;
-  char* type;
+  enum
+  {
+    VAR_INT = 0,
+    VAR_CHAR = 1,
+    VAR_STR = 2,
+    VAR_FUNC = 3,
+  } type;
 } Var;
 
-Var* new_var(void* val, char* type);
+static const char* const var_map[] = {
+  [VAR_INT] = "VAR_INT",
+  [VAR_CHAR] = "VAR_CHAR",
+  [VAR_STR] = "VAR_STRING",
+  [VAR_FUNC] = "VAR_FUNC",
+};
+
+Var* new_var(void* val, int type);
 
 void free_var(Var* var);
 
