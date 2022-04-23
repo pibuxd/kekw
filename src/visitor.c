@@ -179,7 +179,6 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
 
   char* func_name = strdup(ast->token->value);
   Var* funcv = visit_get_var(parser, func_name, local_variables);
-  // ((Function*)funcv->value)->variables = new_variables();
 
   // assign local variables passed in arguments
   AST* v = ast->right;
@@ -212,7 +211,7 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   return result;
 }
 
-// builtin print function (temporary)
+// builtin print function (temporary), passes unlimited arguments
 int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   Var* cond = visit_condition(parser, ast->left, local_variables);

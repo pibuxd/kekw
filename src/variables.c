@@ -69,8 +69,6 @@ int variables_hash(char* str, int size)
 // insert new variable to hash table
 void variables_add(Variables* variables, char* var_name, void* val, int type)
 {
-  // variables->size += 1;
-  // variables->list = realloc(variables->list, variables->size*sizeof(Node*));
   // printf("%s = %p, (%s)\n", var_name, val, var_map[type]);
   int var_name_hash = variables_hash(var_name, variables->size);
 
@@ -98,7 +96,7 @@ void variables_add(Variables* variables, char* var_name, void* val, int type)
   node->next->next = NULL;
 }
 
-// returns {value, type} from hash table
+// returns Var from hash table
 Var* variables_get(Variables* variables, char* var_name)
 { 
   Var* res = new_var(0, VAR_INT);
