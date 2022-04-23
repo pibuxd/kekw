@@ -36,6 +36,8 @@ Return* visit(Parser* parser, AST* ast, Variables* local_variables)
       return new_return(1, visit_condition(parser, ast->right, local_variables));
     case TOKEN_IF:
       return visit_if(parser, ast, local_variables);
+    case TOKEN_WHILE:
+      return visit_while(parser, ast, local_variables);
     case TOKEN_CALL:
       return new_return(0, visit_call_function(parser, ast, local_variables));
   }
@@ -275,6 +277,28 @@ Return* visit_if(Parser* parser, AST* ast, Variables* local_variables)
     }
     free(_ret);
   }
+  
+  return new_return(0, new_var(0, VAR_INT));
+}
+
+// while
+Return* visit_while(Parser* parser, AST* ast, Variables* local_variables)
+{
+  while((intptr_t)visit_condition(parser, ast->left, local_variables)->value != 0)
+  {
+    AST* _ast = ast;
+    while(_ast->mid != NULL)
+    {
+      _ast = _ast->mid;
+      Return* _ret = visit(parser, _ast->right, local_variables);
+      if(_ret->isreturned == 1)
+      {
+        return _ret;
+      }
+      free(_ret);
+    }
+  }
+
   
   return new_return(0, new_var(0, VAR_INT));
 }

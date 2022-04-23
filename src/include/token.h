@@ -29,7 +29,8 @@ typedef struct TOKEN_STRUCT
     TOKEN_CALL, // 21
     TOKEN_IF, // 22
     TOKEN_RETURN, // 23
-    TOKEN_EOF // 24
+    TOKEN_WHILE, // 24
+    TOKEN_EOF // 25
   } type;
 
   char* value;
@@ -59,6 +60,7 @@ static const char* const token_map[] = {
   [TOKEN_FUNC] = "TOKEN_FUNC",
   [TOKEN_CALL] = "TOKEN_CALL",
   [TOKEN_IF] = "TOKEN_IF",
+  [TOKEN_WHILE] = "TOKEN_WHILE",
   [TOKEN_RETURN] = "TOKEN_RETURN",
   [TOKEN_EOF] = "TOKEN_EOF",
 };

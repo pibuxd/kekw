@@ -230,6 +230,10 @@ AST* parser_statement(Parser* parser)
   {
     return parser_if(parser);
   }
+  else if(strcmp(parser_current_token(parser)->value, "while") == 0)
+  {
+    return parser_while(parser);
+  }
   else if(strcmp(parser_current_token(parser)->value, "return") == 0)
   {
     return parser_return(parser);
@@ -349,6 +353,29 @@ AST* parser_get_args(Parser* parser)
 AST* parser_if(Parser* parser)
 {
   AST* ast = new_ast(NULL, NULL, new_token(TOKEN_IF, "if"));
+
+  parser_eat(parser, TOKEN_ID);
+  ast->left = parser_condition(parser);
+  parser_eat(parser, TOKEN_LBRACE);
+
+  AST* _ast = ast;
+
+  while(parser_current_token(parser)->type != TOKEN_RBRACE)
+  {
+    _ast->mid = new_ast(NULL, NULL, NULL);
+    _ast = _ast->mid;
+    _ast->right = parser_statement(parser);
+    parser_eat(parser, TOKEN_SEMI);
+  }
+  
+  parser_eat(parser, TOKEN_RBRACE);
+  
+  return ast;
+}
+
+AST* parser_while(Parser* parser)
+{
+  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_WHILE, "while"));
 
   parser_eat(parser, TOKEN_ID);
   ast->left = parser_condition(parser);

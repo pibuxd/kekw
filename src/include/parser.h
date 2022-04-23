@@ -49,6 +49,8 @@ AST* parser_call_function(Parser* parser);
 
 AST* parser_if(Parser* parser);
 
+AST* parser_while(Parser* parser);
+
 AST* parser_get_args(Parser* parser);
 
 int parser_get_var(Parser* pareser, int hashed);
