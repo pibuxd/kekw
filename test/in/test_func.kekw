@@ -1,13 +1,13 @@
-var f = (x){
-  var x = 6
+f = (x){
+  x = 6
   print(x)
 }
 
-var foo = (x, t){
+foo = (x, t){
   f(x)
   if t == 1 {
     print(y)
-    var y = 69;
+    y = 69;
     foo(x, 0)
     return 0;
   }

@@ -1,6 +1,6 @@
-var test = "TEST"
+test = "TEST"
 
-var foo = (xd){
+foo = (xd){
   print(xd)
 }
 

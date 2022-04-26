@@ -1,11 +1,11 @@
-var foo = (xd){
+foo = (xd){
   if xd == 5 {
     print(xd)
     return 5
   }
   if xd > 6 {
     print(xd-6)
-    var xd = xd + 100
+    xd = xd + 100
     return xd;
   }
 }

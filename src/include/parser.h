@@ -19,6 +19,8 @@ Parser* new_parser(Lexer* lexer, Token* token);
 
 void free_parser(Parser* parser);
 
+Token* parser_peek_token(Parser* parser);
+
 void parser_get_next_token(Parser* parser);
 
 Token* parser_current_token(Parser* parser);

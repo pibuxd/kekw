@@ -1,9 +1,9 @@
-var x = 5;
+x = 5;
 
-var foo = (t) {
+foo = (t) {
   print(2*t+9)
   print(x)
-  var x = 6;
+  x = 6;
   print(x);
 }
 

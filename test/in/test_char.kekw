@@ -1,8 +1,8 @@
-var j = 'j'
-var d = 'd'
-var jd = j+d
+j = 'j'
+d = 'd'
+jd = j+d
 
-var foo = (g){
+foo = (g){
   return char(g)
 }
 

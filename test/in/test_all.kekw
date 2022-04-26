@@ -1,19 +1,19 @@
-var st = "STRING"
-var ch = 'c'
-var intchar = 97
+st = "STRING"
+ch = 'c'
+intchar = 97
 
 print(st, ' ', ch, " int: ", int(ch), ',', intchar, " char: ", char(intchar));
 
-var fo = (){
+fo = (){
   print("xd");
 }
 
-var foo = (g, t, ff){
+foo = (g, t, ff){
   if g == 70 {
     print("if ok");
-    var t = t+300;
+    t = t+300;
   }
-  var g = g+42*2
+  g = g+42*2
   print(g+t)
 
   return fo() + ff;

@@ -39,6 +39,11 @@ void free_parser(Parser* parser)
   free(parser);
 }
 
+Token* parser_peek_token(Parser* parser)
+{
+  return lexer_peek_next_token(parser->lexer);
+}
+
 // get next token to parser
 void parser_get_next_token(Parser* parser)
 {
@@ -222,7 +227,7 @@ void parser_compound(Parser* parser)
 // detect wich statements is it and parse it
 AST* parser_statement(Parser* parser)
 {
-  if(strcmp(parser_current_token(parser)->value, "var") == 0)
+  if(parser_peek_token(parser)->type == TOKEN_EQUALS)
   {
     return parser_assignment_statement(parser);
   }
@@ -254,8 +259,7 @@ AST* parser_return(Parser* parser)
 // change AST with new variable or function assignment
 AST* parser_assignment_statement(Parser* parser)
 {
-  parser_eat(parser, TOKEN_ID);
-  
+  // parser_eat(parser, TOKEN_ID);
   Token* var_tok = parser_current_token(parser);
   parser_eat(parser, TOKEN_ID);
 
