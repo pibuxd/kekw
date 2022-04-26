@@ -9,10 +9,10 @@ print(type(x))
 x = ' '
 print(type(x))
 
-x = (){}
+x = []{}
 print(type(x))
 
-x = (variable, g){
+x = [variable, g]{
   print("DAMNIT")
   return 333
 }

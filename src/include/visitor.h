@@ -18,7 +18,7 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables);
 
 Var* visit_get_var(Parser* parser, char* name, Variables* local_variables);
 
-void visit_define_function(Parser* parser, AST* ast, Variables* local_variables);
+Var* visit_define_function(Parser* parser, AST* ast, Variables* local_variables);
 
 Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables);
 

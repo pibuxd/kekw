@@ -109,6 +109,8 @@ Var* visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variabl
     return visit_get_var(parser, ast->token->value, local_variables);
   case TOKEN_CALL:
     return visit_call_function(parser, ast, local_variables);
+  case TOKEN_FUNC:
+    return visit_define_function(parser, ast, local_variables);
   }
 
   return new_var((void*)(intptr_t)curr_val, VAR_INT);
@@ -122,6 +124,9 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 
   switch (cond->type)
   {
+    case VAR_FUNC:
+      variables_add(local_variables, var_name, cond->value, VAR_FUNC);
+      break;
     case VAR_CHAR:
       variables_add(local_variables, var_name, cond->value, VAR_CHAR);
       break;
@@ -151,13 +156,11 @@ Var* visit_get_var(Parser* parser, char* name, Variables* local_variables)
 }
 
 // define new function
-void visit_define_function(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_define_function(Parser* parser, AST* ast, Variables* local_variables)
 {
-  char* func_name = strdup(ast->token->value);
   Function* funcv = new_function();
-
   funcv->contents = ast;
-  variables_add(local_variables, func_name, funcv, VAR_FUNC);
+  new_var(funcv, VAR_FUNC);
 }
 
 // call function

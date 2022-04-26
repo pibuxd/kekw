@@ -2,7 +2,7 @@ j = 'j'
 d = 'd'
 jd = j+d
 
-foo = (g){
+foo = [g]{
   return char(g)
 }
 

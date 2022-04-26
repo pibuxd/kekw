@@ -96,23 +96,23 @@ AST* parser_condition(Parser* parser)
 
   switch (token->type)
   {
-  case TOKEN_GREATER:
-    parser_eat(parser, TOKEN_GREATER);
-    break;
-  case TOKEN_GREATEREQ:
-    parser_eat(parser, TOKEN_GREATEREQ);
-    break;
-  case TOKEN_LESS:
-    parser_eat(parser, TOKEN_LESS);
-    break;
-  case TOKEN_LESSEQ:
-    parser_eat(parser, TOKEN_LESSEQ);
-    break;
-  case TOKEN_EQ:
-    parser_eat(parser, TOKEN_EQ);
-    break;
-  default:
-    return res;
+    case TOKEN_GREATER:
+      parser_eat(parser, TOKEN_GREATER);
+      break;
+    case TOKEN_GREATEREQ:
+      parser_eat(parser, TOKEN_GREATEREQ);
+      break;
+    case TOKEN_LESS:
+      parser_eat(parser, TOKEN_LESS);
+      break;
+    case TOKEN_LESSEQ:
+      parser_eat(parser, TOKEN_LESSEQ);
+      break;
+    case TOKEN_EQ:
+      parser_eat(parser, TOKEN_EQ);
+      break;
+    default:
+      return res;
   }
   
   return new_ast(res, parser_expr(parser), token);
@@ -170,7 +170,10 @@ AST* parser_term(Parser* parser)
 AST* parser_factor(Parser* parser)
 {
   Token* token = parser_current_token(parser);
-
+  if(token->type == TOKEN_LSQUARE)
+  {
+    return parser_define_function(parser);
+  }
   if(token->type == TOKEN_INT)
   {
     parser_eat(parser, TOKEN_INT);
@@ -259,28 +262,21 @@ AST* parser_return(Parser* parser)
 // change AST with new variable or function assignment
 AST* parser_assignment_statement(Parser* parser)
 {
-  // parser_eat(parser, TOKEN_ID);
   Token* var_tok = parser_current_token(parser);
   parser_eat(parser, TOKEN_ID);
 
   Token* tok = parser_current_token(parser);
   parser_eat(parser, TOKEN_EQUALS);
 
-  // if LPAREN found, jump into defining function
-  if(parser_current_token(parser)->type == TOKEN_LPAREN)
-  {
-    return parser_define_function(parser, var_tok->value);
-  }
-
   return new_ast(new_ast(NULL, NULL, var_tok), parser_condition(parser), tok);
 }
 
 // put new function to AST
-AST* parser_define_function(Parser* parser, char* func_name)
+AST* parser_define_function(Parser* parser)
 {
-  parser_eat(parser, TOKEN_LPAREN);
+  parser_eat(parser, TOKEN_LSQUARE);
   
-  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, func_name));
+  AST* ast = new_ast(NULL, NULL, new_token(TOKEN_FUNC, ""));
   AST* mid2v = ast;
   while(parser_current_token(parser)->type == TOKEN_ID)
   {
@@ -297,7 +293,7 @@ AST* parser_define_function(Parser* parser, char* func_name)
     free(arg_name);
   }
 
-  parser_eat(parser, TOKEN_RPAREN);
+  parser_eat(parser, TOKEN_RSQUARE);
   parser_eat(parser, TOKEN_LBRACE);
 
   AST* midv = ast;

@@ -4,11 +4,11 @@ intchar = 97
 
 print(st, ' ', ch, " int: ", int(ch), ',', intchar, " char: ", char(intchar));
 
-fo = (){
+fo = []{
   print("xd");
 }
 
-foo = (g, t, ff){
+foo = [g, t, ff]{
   if g == 70 {
     print("if ok");
     t = t+300;

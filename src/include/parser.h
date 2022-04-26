@@ -45,7 +45,7 @@ AST* parser_return(Parser* parser);
 
 AST* parser_assignment_statement(Parser* parser);
 
-AST* parser_define_function(Parser* parser, char* f_name);
+AST* parser_define_function(Parser* parser);
 
 AST* parser_call_function(Parser* parser);
 

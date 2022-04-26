@@ -1,6 +1,6 @@
 test = "TEST"
 
-foo = (xd){
+foo = [xd]{
   print(xd)
 }
 

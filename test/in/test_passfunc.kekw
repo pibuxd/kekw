@@ -1,0 +1,17 @@
+printfunc = [x]{
+  print(x)
+}
+
+foo = [lol]{
+  lol(70)
+}
+
+foo(printfunc)
+
+foo = [lol]{
+  lol(60)
+}
+
+foo(printfunc)
+
+foo([y]{print(y+90000);print("WERKS!!!")})

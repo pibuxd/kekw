@@ -1,4 +1,4 @@
-foo = (xd){
+foo = [xd]{
   if xd == 5 {
     print(xd)
     return 5

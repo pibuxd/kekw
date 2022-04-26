@@ -108,6 +108,8 @@ Token* lexer_get_next_token(Lexer* lexer)
       case ')': return lexer_advance_with_token(lexer, new_token(TOKEN_RPAREN, lexer_get_current_char_as_string(lexer)));
       case '{': return lexer_advance_with_token(lexer, new_token(TOKEN_LBRACE, lexer_get_current_char_as_string(lexer)));
       case '}': return lexer_advance_with_token(lexer, new_token(TOKEN_RBRACE, lexer_get_current_char_as_string(lexer)));
+      case '[': return lexer_advance_with_token(lexer, new_token(TOKEN_LSQUARE, lexer_get_current_char_as_string(lexer)));
+      case ']': return lexer_advance_with_token(lexer, new_token(TOKEN_RSQUARE, lexer_get_current_char_as_string(lexer)));
       case ',': return lexer_advance_with_token(lexer, new_token(TOKEN_COMMA, lexer_get_current_char_as_string(lexer)));
     }
   }

@@ -1,6 +1,6 @@
 x = 5;
 
-foo = (t) {
+foo = [t] {
   print(2*t+9)
   print(x)
   x = 6;
