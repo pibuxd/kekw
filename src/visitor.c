@@ -175,6 +175,10 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   {
     return visit_int_function(parser, ast->right, local_variables);
   }
+  else if(strcmp(ast->token->value, "type") == 0)
+  {
+    return visit_type_function(parser, ast->right, local_variables);
+  }
 
   Return* res = new_return(0, new_var(0, VAR_INT));
   Variables* variables = new_variables();
@@ -255,6 +259,14 @@ Var* visit_char_function(Parser* parser, AST* ast, Variables* local_variables)
 {
   Var* cond = visit_condition(parser, ast->left, local_variables);
   cond->type = VAR_CHAR;
+  return cond;
+}
+
+Var* visit_type_function(Parser* parser, AST* ast, Variables* local_variables)
+{
+  Var* cond = visit_condition(parser, ast->left, local_variables);
+  cond->value = new_str(var_map2[cond->type]);
+  cond->type = VAR_STR;
   return cond;
 }
 

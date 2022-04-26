@@ -12,11 +12,18 @@ typedef struct VAR_STRUCT {
   } type;
 } Var;
 
-static const char* const var_map[] = {
+static char* var_map[] = {
   [VAR_INT] = "VAR_INT",
   [VAR_CHAR] = "VAR_CHAR",
-  [VAR_STR] = "VAR_STRING",
+  [VAR_STR] = "VAR_STR",
   [VAR_FUNC] = "VAR_FUNC",
+};
+
+static char* var_map2[] = {
+  [VAR_INT] = "int",
+  [VAR_CHAR] = "char",
+  [VAR_STR] = "str",
+  [VAR_FUNC] = "func",
 };
 
 Var* new_var(void* val, int type);

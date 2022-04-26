@@ -1,0 +1,8 @@
+str
+char
+int
+str
+int
+char
+func
+func

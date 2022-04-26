@@ -28,6 +28,8 @@ Var* visit_int_function(Parser* parser, AST* ast, Variables* local_variables);
 
 Var* visit_char_function(Parser* parser, AST* ast, Variables* local_variables);
 
+Var* visit_type_function(Parser* parser, AST* ast, Variables* local_variables);
+
 Return* visit_if(Parser* parser, AST* ast, Variables* local_variables);
 
 Return* visit_while(Parser* parser, AST* ast, Variables* local_variables);

@@ -1,0 +1,20 @@
+print(type("jddd"))
+print(type('k'))
+print(type(4222))
+
+x = "damn"
+print(type(x))
+x = 99
+print(type(x))
+x = ' '
+print(type(x))
+
+x = (){}
+print(type(x))
+
+x = (variable, g){
+  print("DAMNIT")
+  return 333
+}
+
+print(type(x))
