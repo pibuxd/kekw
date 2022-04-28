@@ -1,21 +1,12 @@
-f = [x]{
+foo = []{
+  foo2 = []{
+    x = 5
+    print(x)
+  }
+
   x = 6
+  foo2()
   print(x)
 }
 
-foo = [x, t]{
-  f(x)
-  if t == 1 {
-    print(y)
-    y = 69;
-    foo(x, 0)
-    return 0;
-  }
-  print(y);
-}
-
-foo(10, 1)
-
-f = (5+3)/2;
-
-print(f);
+foo()

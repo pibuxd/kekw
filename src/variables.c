@@ -99,7 +99,7 @@ void variables_add(Variables* variables, char* var_name, void* val, int type)
 // returns Var from hash table
 Var* variables_get(Variables* variables, char* var_name)
 { 
-  Var* res = new_var(0, VAR_INT);
+  Var* res = new_var(0, VAR_NONE);
   int var_name_hash = variables_hash(var_name, variables->size);
   
   Node* node = variables->list[var_name_hash];

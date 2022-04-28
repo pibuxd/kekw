@@ -1,0 +1,6 @@
+x = "damn"
+d = "damn"
+
+if x == d {
+  print("OK");
+}

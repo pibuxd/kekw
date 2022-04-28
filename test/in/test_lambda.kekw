@@ -1,0 +1,7 @@
+t = [a]{return [b]{return a}}
+f = [a]{return [b]{return b}}
+not = [a]{return a(f)(t)}
+and = [a]{return [b]{return a(b)(a)}}
+nand = [a]{return [b]{return not(and(a)(b))}}
+or = [a]{return [b]{return nand(not(a))(not(b))}}
+xor = [a]{return [b]{return and(or(a)(b))(nand(a)(b))}}

@@ -8,9 +8,12 @@
 // main function (starts)
 void visit_compound(Parser* parser)
 {
+  Scope* scope = new_scope();
+  scope_insert(scope, parser->global_variables);
+
   for(int i = 1; i <= parser->ast_size; i++)
   {
-    Return* res = visit(parser, parser->ast[i], parser->global_variables);
+    Return* res = visit(parser, parser->ast[i], scope);
     // if "return" had been captured
     if(res->isreturned == 1)
     {
@@ -22,24 +25,41 @@ void visit_compound(Parser* parser)
 }
 
 // visit new
-Return* visit(Parser* parser, AST* ast, Variables* local_variables)
+Return* visit(Parser* parser, AST* ast, Scope* scope)
 {
   switch (ast->token->type)
   {
     case TOKEN_EQUALS:
-      visit_assign_var(parser, ast, local_variables);
+      visit_assign_var(parser, ast, scope);
       break;
     case TOKEN_FUNC:
-      visit_define_function(parser, ast, local_variables);
+      visit_define_function(parser, ast, scope);
       break;
     case TOKEN_RETURN:
-      return new_return(1, visit_condition(parser, ast->right, local_variables));
+      return new_return(1, visit_condition(parser, ast->right, scope));
     case TOKEN_IF:
-      return visit_if(parser, ast, local_variables);
+      return visit_if(parser, ast, scope);
     case TOKEN_WHILE:
-      return visit_while(parser, ast, local_variables);
+      return visit_while(parser, ast, scope);
     case TOKEN_CALL:
-      return new_return(0, visit_call_function(parser, ast, local_variables));
+      int cnt = 1;
+      Return* rr = new_return(0, visit_call_function(parser, ast, scope, new_var(0, VAR_NONE)));
+      if(rr->var->type != VAR_FUNC)
+      {
+        cnt = 0;
+      }
+      while(rr->var->type == VAR_FUNC)
+      {
+        cnt += 1;
+        ast = ast->mid;
+        rr = new_return(0, visit_call_function(parser, ast, scope, rr->var));
+      }
+      while(cnt--)
+      {
+        scope_pop(scope);
+      }
+      return rr;
+
   }
 
   return new_return(0, new_var(0, VAR_INT));
@@ -48,56 +68,56 @@ Return* visit(Parser* parser, AST* ast, Variables* local_variables)
 // returns Var from given condition in AST
 // ! supported operators: +, -, *, /, , >, <, <=, >=, ==
 // ! operators works only on int and char
-Var* visit_condition(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_condition(Parser* parser, AST* ast, Scope* scope)
 {
   switch (ast->token->type)
   {
   case TOKEN_GREATER:
   {
-    Var* ex = visit_expr(parser, ast->left, 0, local_variables);
-    return new_var((void*)(intptr_t)((intptr_t)ex->value > (intptr_t)visit_expr(parser, ast->right, 0, local_variables)->value), ex->type);
+    Var* ex = visit_expr(parser, ast->left, 0, scope);
+    return new_var((void*)(intptr_t)((intptr_t)ex->value > (intptr_t)visit_expr(parser, ast->right, 0, scope)->value), ex->type);
   }
   case TOKEN_GREATEREQ:
   {
-    Var* ex = visit_expr(parser, ast->left, 0, local_variables);
-    return new_var((void*)(intptr_t)((intptr_t)ex->value >= (intptr_t)visit_expr(parser, ast->right, 0, local_variables)->value), ex->type);
+    Var* ex = visit_expr(parser, ast->left, 0, scope);
+    return new_var((void*)(intptr_t)((intptr_t)ex->value >= (intptr_t)visit_expr(parser, ast->right, 0, scope)->value), ex->type);
   }
   case TOKEN_LESS:
   {
-    Var* ex = visit_expr(parser, ast->left, 0, local_variables);
-    return new_var((void*)(intptr_t)((intptr_t)ex->value < (intptr_t)visit_expr(parser, ast->right, 0, local_variables)->value), ex->type);
+    Var* ex = visit_expr(parser, ast->left, 0, scope);
+    return new_var((void*)(intptr_t)((intptr_t)ex->value < (intptr_t)visit_expr(parser, ast->right, 0, scope)->value), ex->type);
   }
   case TOKEN_LESSEQ:
   {
-    Var* ex = visit_expr(parser, ast->left, 0, local_variables);
-    return new_var((void*)(intptr_t)((intptr_t)ex->value <= (intptr_t)visit_expr(parser, ast->right, 0, local_variables)->value), ex->type);
+    Var* ex = visit_expr(parser, ast->left, 0, scope);
+    return new_var((void*)(intptr_t)((intptr_t)ex->value <= (intptr_t)visit_expr(parser, ast->right, 0, scope)->value), ex->type);
   }
   case TOKEN_EQ:
   {
-    Var* ex = visit_expr(parser, ast->left, 0, local_variables);
-    return new_var((void*)(intptr_t)((intptr_t)ex->value == (intptr_t)visit_expr(parser, ast->right, 0, local_variables)->value), ex->type);
+    Var* ex = visit_expr(parser, ast->left, 0, scope);
+    return new_var((void*)(intptr_t)((intptr_t)ex->value == (intptr_t)visit_expr(parser, ast->right, 0, scope)->value), ex->type);
   }
   default:
-    return visit_expr(parser, ast, 0, local_variables);
+    return visit_expr(parser, ast, 0, scope);
   }
 }
 
 // visit expression calculates expr, supports inteegers and variables
-Var* visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variables)
+Var* visit_expr(Parser* parser, AST* ast, int curr_val, Scope* scope)
 {
   switch (ast->token->type)
   {
   case TOKEN_PLUS:
-    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, local_variables)->value + (intptr_t)visit_expr(parser, ast->right, curr_val, local_variables)->value;
+    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, scope)->value + (intptr_t)visit_expr(parser, ast->right, curr_val, scope)->value;
     break;
   case TOKEN_MINUS:
-    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, local_variables)->value - (intptr_t)visit_expr(parser, ast->right, curr_val, local_variables)->value;
+    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, scope)->value - (intptr_t)visit_expr(parser, ast->right, curr_val, scope)->value;
     break;
   case TOKEN_MUL:
-    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, local_variables)->value * (intptr_t)visit_expr(parser, ast->right, curr_val, local_variables)->value;
+    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, scope)->value * (intptr_t)visit_expr(parser, ast->right, curr_val, scope)->value;
     break;
   case TOKEN_DIV:
-    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, local_variables)->value / (intptr_t)visit_expr(parser, ast->right, curr_val, local_variables)->value;
+    curr_val += (intptr_t)visit_expr(parser, ast->left, curr_val, scope)->value / (intptr_t)visit_expr(parser, ast->right, curr_val, scope)->value;
     break;
   case TOKEN_INT:
     return new_var((void*)(intptr_t)atoi(ast->token->value), VAR_INT);
@@ -106,35 +126,50 @@ Var* visit_expr(Parser* parser, AST* ast, int curr_val, Variables* local_variabl
   case TOKEN_STRING:
     return new_var(new_str(ast->token->value), VAR_STR);
   case TOKEN_ID:
-    return visit_get_var(parser, ast->token->value, local_variables);
+    return visit_get_var(parser, ast->token->value, scope);
   case TOKEN_CALL:
-    return visit_call_function(parser, ast, local_variables);
+    int cnt = 1;
+    Var* rr = visit_call_function(parser, ast, scope, new_var(0, VAR_NONE));
+    if(rr->type != VAR_FUNC)
+    {
+      cnt = 0;
+    }
+    while(rr->type == VAR_FUNC)
+    {
+      cnt += 1;
+      ast = ast->mid;
+      rr = visit_call_function(parser, ast, scope, rr);
+    }
+    while(cnt--)
+    {
+      scope_pop(scope);
+    }
+    return rr;
   case TOKEN_FUNC:
-    return visit_define_function(parser, ast, local_variables);
+    return visit_define_function(parser, ast, scope);
   }
 
   return new_var((void*)(intptr_t)curr_val, VAR_INT);
 }
 
 // assigns Var
-void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
+void visit_assign_var(Parser* parser, AST* ast, Scope* scope)
 { 
   char* var_name = strdup(ast->left->token->value);
-  Var* cond = visit_condition(parser, ast->right, local_variables);
-
+  Var* cond = visit_condition(parser, ast->right, scope);
   switch (cond->type)
   {
     case VAR_FUNC:
-      variables_add(local_variables, var_name, cond->value, VAR_FUNC);
+      variables_add(scope_top(scope), var_name, cond->value, VAR_FUNC);
       break;
     case VAR_CHAR:
-      variables_add(local_variables, var_name, cond->value, VAR_CHAR);
+      variables_add(scope_top(scope), var_name, cond->value, VAR_CHAR);
       break;
     case VAR_INT:
-      variables_add(local_variables, var_name, cond->value, VAR_INT);
+      variables_add(scope_top(scope), var_name, cond->value, VAR_INT);
       break;
     case VAR_STR:
-      variables_add(local_variables, var_name, cond->value, VAR_STR);
+      variables_add(scope_top(scope), var_name, cond->value, VAR_STR);
       break;
   }
   
@@ -142,21 +177,22 @@ void visit_assign_var(Parser* parser, AST* ast, Variables* local_variables)
 }
 
 // gets Var
-Var* visit_get_var(Parser* parser, char* name, Variables* local_variables)
+Var* visit_get_var(Parser* parser, char* name, Scope* scope)
 {
-  Var* var = variables_get(local_variables, name);
-  if(var->value != NULL)
+  for(int i = scope->size; i >= 1; i--)
   {
-    return var;
+    Var* var = variables_get(scope->local_variables[i], name);
+    if(var->type != VAR_NONE)
+    {
+      return var;
+    }
   }
-  else // global variable
-  {
-    return variables_get(parser->global_variables, name);
-  }
+  
+  return new_var(0, VAR_INT);
 }
 
 // define new function
-Var* visit_define_function(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_define_function(Parser* parser, AST* ast, Scope* scope)
 {
   Function* funcv = new_function();
   funcv->contents = ast;
@@ -164,30 +200,36 @@ Var* visit_define_function(Parser* parser, AST* ast, Variables* local_variables)
 }
 
 // call function
-Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_call_function(Parser* parser, AST* ast, Scope* scope, Var* funcv)
 {
+  if(funcv->value != NULL)
+  {
+    goto withvar;
+  }
   if(strcmp(ast->token->value, "print") == 0)
   {
-    return new_var((void*)(intptr_t)visit_print_function(parser, ast->right, local_variables), VAR_INT);
+    return new_var((void*)(intptr_t)visit_print_function(parser, ast->right, scope), VAR_INT);
   }
   else if(strcmp(ast->token->value, "char") == 0)
   {
-    return visit_char_function(parser, ast->right, local_variables);
+    return visit_char_function(parser, ast->right, scope);
   }
   else if(strcmp(ast->token->value, "int") == 0)
   {
-    return visit_int_function(parser, ast->right, local_variables);
+    return visit_int_function(parser, ast->right, scope);
   }
   else if(strcmp(ast->token->value, "type") == 0)
   {
-    return visit_type_function(parser, ast->right, local_variables);
+    return visit_type_function(parser, ast->right, scope);
   }
+
+  char* func_name = strdup(ast->token->value);
+  funcv = visit_get_var(parser, func_name, scope);
+  free(func_name);
+  withvar:
 
   Return* res = new_return(0, new_var(0, VAR_INT));
   Variables* variables = new_variables();
-
-  char* func_name = strdup(ast->token->value);
-  Var* funcv = visit_get_var(parser, func_name, local_variables);
 
   // assign local variables passed in arguments
   AST* v = ast->right;
@@ -195,17 +237,19 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   while(mid2v->mid2 != NULL)
   {
     mid2v = mid2v->mid2;
-    Var* var = visit_condition(parser, v->left, local_variables);
+    Var* var = visit_condition(parser, v->left, scope);
     variables_add(variables, mid2v->token->value, var->value, var->type);
     v = v->right;
   }
+
+  scope_insert(scope, variables);
 
   AST* midv = ((Function*)funcv->value)->contents;
   while(midv->mid != NULL)
   { 
     midv = midv->mid;
 
-    res = visit(parser, midv->right, variables);
+    res = visit(parser, midv->right, scope);
     if(res->isreturned == 1)
     {
       goto ret;
@@ -213,17 +257,19 @@ Var* visit_call_function(Parser* parser, AST* ast, Variables* local_variables)
   }
 
   ret:
-  free_variables(variables);
   Var* result = res->var;
+  if(res->var->type != VAR_FUNC)
+  {
+    scope_pop(scope);
+  }
 
-  free(func_name);
   return result;
 }
 
 // builtin print function (temporary), passes unlimited arguments
-int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
+int visit_print_function(Parser* parser, AST* ast, Scope* scope)
 {
-  Var* cond = visit_condition(parser, ast->left, local_variables);
+  Var* cond = visit_condition(parser, ast->left, scope);
   
   if(cond->type == VAR_STR)
   {
@@ -241,7 +287,7 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
   free(cond);
   if(ast->right != NULL)
   {
-    return visit_print_function(parser, ast->right, local_variables);
+    return visit_print_function(parser, ast->right, scope);
   }
 
   printf("\n");
@@ -250,70 +296,78 @@ int visit_print_function(Parser* parser, AST* ast, Variables* local_variables)
 
 // builtin int function
 // * int function forces condition to be int
-Var* visit_int_function(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_int_function(Parser* parser, AST* ast, Scope* scope)
 {
-  Var* cond = visit_condition(parser, ast->left, local_variables);
+  Var* cond = visit_condition(parser, ast->left, scope);
   cond->type = VAR_INT;
   return cond;
 }
 
 // * char function forces condition to be char
-Var* visit_char_function(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_char_function(Parser* parser, AST* ast, Scope* scope)
 {
-  Var* cond = visit_condition(parser, ast->left, local_variables);
+  Var* cond = visit_condition(parser, ast->left, scope);
   cond->type = VAR_CHAR;
   return cond;
 }
 
-Var* visit_type_function(Parser* parser, AST* ast, Variables* local_variables)
+Var* visit_type_function(Parser* parser, AST* ast, Scope* scope)
 {
-  Var* cond = visit_condition(parser, ast->left, local_variables);
+  Var* cond = visit_condition(parser, ast->left, scope);
   cond->value = new_str(var_map2[cond->type]);
   cond->type = VAR_STR;
   return cond;
 }
 
 // just if
-Return* visit_if(Parser* parser, AST* ast, Variables* local_variables)
+Return* visit_if(Parser* parser, AST* ast, Scope* scope)
 {
-  if((intptr_t)visit_condition(parser, ast->left, local_variables)->value == 0)
+  if((intptr_t)visit_condition(parser, ast->left, scope)->value == 0)
   {
     return new_return(0, new_var(0, VAR_INT));
   }
+  
+  scope_insert(scope, new_variables());
 
   AST* _ast = ast;
   while(_ast->mid != NULL)
   {
+    printf("siz: %d\n", scope->size);
     _ast = _ast->mid;
-    Return* _ret = visit(parser, _ast->right, local_variables);
+    Return* _ret = visit(parser, _ast->right, scope);
     if(_ret->isreturned == 1)
     {
+      scope_pop(scope);
       return _ret;
     }
     free(_ret);
   }
   
+  scope_pop(scope);
   return new_return(0, new_var(0, VAR_INT));
 }
 
 // while
-Return* visit_while(Parser* parser, AST* ast, Variables* local_variables)
+Return* visit_while(Parser* parser, AST* ast, Scope* scope)
 {
-  while((intptr_t)visit_condition(parser, ast->left, local_variables)->value != 0)
+  scope_insert(scope, new_variables());
+
+  while((intptr_t)visit_condition(parser, ast->left, scope)->value != 0)
   {
     AST* _ast = ast;
     while(_ast->mid != NULL)
     {
       _ast = _ast->mid;
-      Return* _ret = visit(parser, _ast->right, local_variables);
+      Return* _ret = visit(parser, _ast->right, scope);
       if(_ret->isreturned == 1)
       {
+        scope_pop(scope);
         return _ret;
       }
       free(_ret);
     }
   }
 
-  
+  scope_pop(scope);
   return new_return(0, new_var(0, VAR_INT));
 }

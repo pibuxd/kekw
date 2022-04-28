@@ -192,7 +192,6 @@ AST* parser_factor(Parser* parser)
   else if(token->type == TOKEN_ID)
   {
     parser_eat(parser, TOKEN_ID);
-
     if(parser_current_token(parser)->type == TOKEN_LPAREN)
     {
       return parser_call_function(parser);
@@ -325,6 +324,11 @@ AST* parser_call_function(Parser* parser)
   parser_eat(parser, TOKEN_LPAREN);
   ast->right = parser_get_args(parser);
   parser_eat(parser, TOKEN_RPAREN);
+
+  if(parser_current_token(parser)->type == TOKEN_LPAREN)
+  {
+    ast->mid = parser_call_function(parser);
+  }
 
   return ast;
 }
