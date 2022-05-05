@@ -32,7 +32,7 @@ Return* visit(Parser* parser, AST* ast, Scope* scope)
     case TOKEN_EQUALS:
       visit_assign_var(parser, ast, scope);
       break;
-    case TOKEN_FUNC:
+    case TOKEN_FUNC: // maybe useless
       visit_define_function(parser, ast, scope);
       break;
     case TOKEN_RETURN:
@@ -181,7 +181,7 @@ Var* visit_get_var(Parser* parser, char* name, Scope* scope)
 {
   for(int i = scope->size; i >= 1; i--)
   {
-    Var* var = variables_get(scope->local_variables[i], name);
+    Var* var = variables_get(scope->variables[i], name);
     if(var->type != VAR_NONE)
     {
       return var;
@@ -196,7 +196,7 @@ Var* visit_define_function(Parser* parser, AST* ast, Scope* scope)
 {
   Function* funcv = new_function();
   funcv->contents = ast;
-  new_var(funcv, VAR_FUNC);
+  return new_var(funcv, VAR_FUNC);
 }
 
 // call function
@@ -242,6 +242,7 @@ Var* visit_call_function(Parser* parser, AST* ast, Scope* scope, Var* funcv)
     v = v->right;
   }
 
+  // scope_pop_name(scope);
   scope_insert(scope, variables);
 
   AST* midv = ((Function*)funcv->value)->contents;
@@ -327,31 +328,24 @@ Return* visit_if(Parser* parser, AST* ast, Scope* scope)
     return new_return(0, new_var(0, VAR_INT));
   }
   
-  scope_insert(scope, new_variables());
-
   AST* _ast = ast;
   while(_ast->mid != NULL)
   {
-    printf("siz: %d\n", scope->size);
     _ast = _ast->mid;
     Return* _ret = visit(parser, _ast->right, scope);
     if(_ret->isreturned == 1)
     {
-      scope_pop(scope);
       return _ret;
     }
     free(_ret);
   }
   
-  scope_pop(scope);
   return new_return(0, new_var(0, VAR_INT));
 }
 
 // while
 Return* visit_while(Parser* parser, AST* ast, Scope* scope)
 {
-  scope_insert(scope, new_variables());
-
   while((intptr_t)visit_condition(parser, ast->left, scope)->value != 0)
   {
     AST* _ast = ast;
@@ -361,13 +355,11 @@ Return* visit_while(Parser* parser, AST* ast, Scope* scope)
       Return* _ret = visit(parser, _ast->right, scope);
       if(_ret->isreturned == 1)
       {
-        scope_pop(scope);
         return _ret;
       }
       free(_ret);
     }
   }
 
-  scope_pop(scope);
   return new_return(0, new_var(0, VAR_INT));
 }
