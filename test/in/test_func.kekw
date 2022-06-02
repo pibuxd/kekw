@@ -1,6 +1,5 @@
 foo = []{
   foo2 = []{
-    x = 5
     print(x)
   }
 

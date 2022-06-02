@@ -1,3 +1,10 @@
 x = 5
 print(x)
 f = 66
+
+f = []{print("DAMN")}
+f()
+f = []{print("LOL")}
+f()
+
+print(type(k))

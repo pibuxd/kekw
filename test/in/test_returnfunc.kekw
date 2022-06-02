@@ -1,13 +1,9 @@
 multby = [x]{
   return [y] {
-    print("damnit")
     return [z] {
-      print("x = ", x);
-      print("y = ", y);
-      print("z = ", z);
-      return "DAAAAA"
+      return x*y*z
     }
   }
 }
 
-print(multby(5)(6)(7))
+print(multby(4)(2)(6))
