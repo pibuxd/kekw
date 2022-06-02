@@ -128,12 +128,8 @@ Var* visit_expr(Parser* parser, AST* ast, int curr_val, Scope* scope)
   case TOKEN_ID:
     return visit_get_var(parser, ast->token->value, scope);
   case TOKEN_CALL:
-    int cnt = 1;
+    int cnt = 0;
     Var* rr = visit_call_function(parser, ast, scope, new_var(0, VAR_NONE));
-    if(rr->type != VAR_FUNC)
-    {
-      cnt = 0;
-    }
     while(rr->type == VAR_FUNC)
     {
       cnt += 1;
@@ -143,6 +139,7 @@ Var* visit_expr(Parser* parser, AST* ast, int curr_val, Scope* scope)
     while(cnt--)
     {
       scope_pop(scope);
+      // puts("DEL");
     }
     return rr;
   case TOKEN_FUNC:
@@ -157,19 +154,32 @@ void visit_assign_var(Parser* parser, AST* ast, Scope* scope)
 { 
   char* var_name = strdup(ast->left->token->value);
   Var* cond = visit_condition(parser, ast->right, scope);
+
+  int scopei = 0;
+  for(int i = scope->size; i >= 1; i--)
+  {
+    scopei = i;
+    Var* var = variables_get(scope->variables[i], var_name);
+    if(var->type != VAR_NONE)
+    {
+      goto assignvar;
+    }
+  }
+
+  assignvar:
   switch (cond->type)
   {
     case VAR_FUNC:
-      variables_add(scope_top(scope), var_name, cond->value, VAR_FUNC);
+      variables_add(scope->variables[scopei], var_name, cond->value, VAR_FUNC);
       break;
     case VAR_CHAR:
-      variables_add(scope_top(scope), var_name, cond->value, VAR_CHAR);
+      variables_add(scope->variables[scopei], var_name, cond->value, VAR_CHAR);
       break;
     case VAR_INT:
-      variables_add(scope_top(scope), var_name, cond->value, VAR_INT);
+      variables_add(scope->variables[scopei], var_name, cond->value, VAR_INT);
       break;
     case VAR_STR:
-      variables_add(scope_top(scope), var_name, cond->value, VAR_STR);
+      variables_add(scope->variables[scopei], var_name, cond->value, VAR_STR);
       break;
   }
   
@@ -242,7 +252,6 @@ Var* visit_call_function(Parser* parser, AST* ast, Scope* scope, Var* funcv)
     v = v->right;
   }
 
-  // scope_pop_name(scope);
   scope_insert(scope, variables);
 
   AST* midv = ((Function*)funcv->value)->contents;

@@ -4,7 +4,6 @@
 Function* new_function()
 {
   Function* function = calloc(1, sizeof(Function));
-
   function->contents = new_ast(NULL, NULL, NULL);
 
   return function;

@@ -6,7 +6,7 @@
 typedef struct SCOPE_STRUCT
 {
   int size;
-  Variables** local_variables;
+  Variables** variables;
 } Scope;
 
 Scope* new_scope();
