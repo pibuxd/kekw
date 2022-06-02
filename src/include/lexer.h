@@ -21,6 +21,10 @@ char lexer_peek(Lexer* lexer);
 
 void lexer_skip_whitespace(Lexer* lexer);
 
+void lexer_skip_comment(Lexer* lexer);
+
+void lexer_skip_multicomment(Lexer* lexer);
+
 Token* lexer_get_next_token(Lexer* lexer);
 
 Token* lexer_peek_next_token(Lexer* lexer);

@@ -1,0 +1,11 @@
+# testing comments
+x = 5 #variable x
+  print(x) #that is comment
+print("done")
+
+## multiline comments
+
+ffdaf df 
+ fdf dfd
+
+that is end of multiline comment## print("this is the end")

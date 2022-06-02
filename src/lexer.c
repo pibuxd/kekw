@@ -55,6 +55,32 @@ void lexer_skip_whitespace(Lexer* lexer)
   }
 }
 
+void lexer_skip_comment(Lexer* lexer)
+{
+  while(lexer->current_c != 10) // 10 is Line Feed in ASCII
+  {
+    lexer_advance(lexer);
+  }
+
+  lexer->current_line += 1;
+}
+
+void lexer_skip_multicomment(Lexer* lexer)
+{
+  lexer_advance(lexer);
+  lexer_advance(lexer);
+  while(lexer->current_c != '#') // 10 is Line Feed in ASCII
+  {
+    if(lexer->current_c == 10)
+    {
+      lexer->current_line += 1;
+    }
+    lexer_advance(lexer);
+  }
+  lexer_advance(lexer);
+  lexer_advance(lexer);
+}
+
 // returns next Token and advance Lexer
 Token* lexer_get_next_token(Lexer* lexer)
 {
@@ -62,7 +88,15 @@ Token* lexer_get_next_token(Lexer* lexer)
   {
     if(lexer->current_c == ' ' || lexer->current_c == 10)
       lexer_skip_whitespace(lexer);
-    
+    if(lexer->current_c == '#')
+    {
+      if(lexer_peek(lexer) == '#')
+        lexer_skip_multicomment(lexer);
+      else
+        lexer_skip_comment(lexer);
+      continue;
+    }
+
     if(isdigit(lexer->current_c))
     {
       char* str = lexer_collect_int(lexer);
